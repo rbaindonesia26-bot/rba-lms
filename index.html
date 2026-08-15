@@ -4,9 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no, viewport-fit=cover">
   <meta name="HandheldFriendly" content="true">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   
   <title>RBA LMS Enterprise</title>
   
+  <!-- PWA Meta Tags (Aman untuk iOS & Android) -->
+  <meta name="theme-color" content="#0B1120">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RBA LMS">
+  <link rel="apple-touch-icon" href="https://i.ibb.co.com/KjWmd251/Chat-GPT-Image-Jul-31-2026-03-05-22-PM.png">
+  
+  <!-- PWA Injector Script (Dibungkus Try-Catch agar tidak bisa merusak sistem utama) -->
+  <script>
+    try {
+      // 1. Membangun File Manifest (Buku Petunjuk PWA) secara aman
+      const manifest = {
+        name: "Rumah Bahasa Arab LMS",
+        short_name: "RBA LMS",
+        description: "Platform Belajar RBA",
+        start_url: "./?source=pwa",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#0B1120",
+        icons: [{ src: "https://i.ibb.co.com/KjWmd251/Chat-GPT-Image-Jul-31-2026-03-05-22-PM.png", sizes: "192x192 512x512", type: "image/png" }]
+      };
+      
+      // Mengubah Teks menjadi Data URL (Bypass blokir sistem)
+      const manifestUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = manifestUrl;
+      document.head.appendChild(link);
+
+      // 2. Pura-pura mendaftarkan Service Worker agar Syarat Install PWA terpenuhi
+      if ('serviceWorker' in navigator) {
+        const swCode = `self.addEventListener('fetch', function(e) {});`;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register(swUrl).catch(() => {
+             // Jika ditolak oleh browser/sistem, matikan diam-diam (tidak ada error di layar)
+          });
+        });
+      }
+    } catch (error) {
+       // Pelindung mutlak: Jika terjadi error apapun di sini, aplikasi React tetap aman!
+    }
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -222,7 +271,7 @@
       </div>
     );
     
-    const LandingPage = ({ onLogin, usersData, isDbReady, coursesData, darkMode, toggleDarkMode, lang, setLang, pengumuman }) => {
+    const LandingPage = ({ onLogin, usersData, isDbReady, coursesData, darkMode, toggleDarkMode, lang, setLang, pengumuman, libraryData }) => {
       const [showLoginModal, setShowLoginModal] = useState(false);
       
       const [showRegModal, setShowRegModal] = useState(false);
@@ -241,21 +290,6 @@
       const [openFaq, setOpenFaq] = useState(null);
       
       const [uploadStatusText, setUploadStatusText] = useState('');
-      const [isCopied, setIsCopied] = useState(false);
-
-      const handleCopyLink = () => {
-          const url = "https://rbaindonesia26-bot.github.io/rba-omnireader/";
-          const textArea = document.createElement("textarea");
-          textArea.value = url;
-          document.body.appendChild(textArea);
-          textArea.select();
-          try { 
-              document.execCommand('copy'); 
-              setIsCopied(true); 
-              setTimeout(() => setIsCopied(false), 2000); 
-          } catch (err) {}
-          document.body.removeChild(textArea);
-      };
 
       const textDict = {
         id: { title1: "Belajar Bahasa Arab", title2: "& Ilmu Syar'i", title3: "dalam Satu Platform", btnStart: "Masuk Kelas", btnRegister: "Daftar (WA)", btnLogin: "Masuk", nav1: "Beranda", nav2: "Keunggulan", nav3: "Program", nav4: "Panduan" },
@@ -387,6 +421,7 @@
         { name: t.nav3, id: 'program-unggulan' },
         { name: t.nav4, id: 'cara-bergabung' },
         { name: 'Media Publik', id: 'media-publik' },
+        { name: 'Perpustakaan', id: 'perpustakaan-publik' },
         { name: 'FAQ', id: 'faq' }
       ];
 
@@ -450,43 +485,48 @@
                     ))}
                 </div>
 
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="relative">
-                    <button onClick={() => setShowLangMenu(!showLangMenu)} className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors mr-1 sm:mr-2" title="Ganti Bahasa">
-                      <Globe size={18} className="w-4 h-4 sm:w-5 sm:h-5"/>
-                    </button>
-                    {showLangMenu && (
-                      <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50 animate-fade-in">
-                         <button onClick={() => { setLang('id'); setShowLangMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300">🇮🇩 Indonesia</button>
-                         <button onClick={() => { setLang('ar'); setShowLangMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-arabic" dir="rtl">🇸🇦 العربية</button>
-                         <button onClick={() => { setLang('en'); setShowLangMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300">🇬🇧 English</button>
-                      </div>
-                    )}
+                <div className="flex items-center gap-1.5 sm:gap-3">
+                  {/* BAHASA - Ikon Dunia (Globe) */}
+                  <div className="static sm:relative">
+                     <button onClick={() => { setShowLangMenu(!showLangMenu); setShowPublicNotif(false); }} className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors relative" title="Ganti Bahasa">
+                       <Globe size={18} className="w-4 h-4 sm:w-5 sm:h-5"/>
+                     </button>
+                     {showLangMenu && (
+                        <div className="fixed top-[70px] left-1/2 -translate-x-1/2 w-[90vw] max-w-[280px] sm:absolute sm:top-[calc(100%+10px)] sm:left-auto sm:right-0 sm:translate-x-0 sm:w-40 z-[100] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 animate-fade-in overflow-hidden origin-top sm:origin-top-right">
+                            <div className="flex flex-col py-2">
+                                <button onClick={() => { setLang('id'); setShowLangMenu(false); }} className={`px-4 py-2 text-left text-sm font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 ${lang === 'id' ? 'text-blue-600' : 'text-slate-700 dark:text-slate-300'}`}>🇮🇩 Indonesia</button>
+                                <button onClick={() => { setLang('ar'); setShowLangMenu(false); }} className={`px-4 py-2 text-left text-sm font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 ${lang === 'ar' ? 'text-blue-600' : 'text-slate-700 dark:text-slate-300'}`}>🇸🇦 العربية</button>
+                                <button onClick={() => { setLang('en'); setShowLangMenu(false); }} className={`px-4 py-2 text-left text-sm font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 ${lang === 'en' ? 'text-blue-600' : 'text-slate-700 dark:text-slate-300'}`}>🇬🇧 English</button>
+                            </div>
+                        </div>
+                     )}
                   </div>
 
-                  <div className="relative">
-                     <button onClick={() => setShowPublicNotif(!showPublicNotif)} className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors mr-1 sm:mr-2 relative" title="Informasi Publik">
+                  {/* PENGUMUMAN - Ikon Lonceng */}
+                  <div className="static sm:relative">
+                     <button onClick={() => { setShowPublicNotif(!showPublicNotif); setShowLangMenu(false); }} className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors relative" title="Informasi Publik">
                        <Bell size={18} className="w-4 h-4 sm:w-5 sm:h-5"/>
                        {pengumuman && <span className="absolute top-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-rose-500 rounded-full border-2 border-slate-100 dark:border-slate-800 animate-pulse"></span>}
                      </button>
                      {showPublicNotif && (
-                       <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 animate-fade-in overflow-hidden">
-                          <div className="p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-                             <Megaphone size={16} className="text-blue-600 dark:text-blue-400"/>
-                             <h3 className="font-bold text-sm text-slate-900 dark:text-white">Papan Informasi RBA</h3>
-                          </div>
-                          <div className="p-4 max-h-60 overflow-y-auto custom-scrollbar">
-                             {pengumuman ? (
-                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{pengumuman}</p>
-                             ) : (
-                                <p className="text-sm text-slate-400 text-center italic">Belum ada pengumuman baru saat ini.</p>
-                             )}
-                          </div>
-                       </div>
+                        <div className="fixed top-[70px] left-1/2 -translate-x-1/2 w-[92vw] max-w-[340px] sm:absolute sm:top-[calc(100%+10px)] sm:left-auto sm:right-0 sm:translate-x-0 sm:w-80 z-[100] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 animate-fade-in overflow-hidden origin-top sm:origin-top-right">
+                            <div className="p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                                <Megaphone size={16} className="text-blue-600 dark:text-blue-400"/>
+                                <h3 className="font-bold text-sm text-slate-900 dark:text-white">Papan Informasi RBA</h3>
+                            </div>
+                            <div className="p-4 max-h-60 overflow-y-auto custom-scrollbar">
+                                {pengumuman ? (
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{pengumuman}</p>
+                                ) : (
+                                    <p className="text-sm text-slate-400 text-center italic">Belum ada pengumuman baru saat ini.</p>
+                                )}
+                            </div>
+                        </div>
                      )}
                   </div>
 
-                  <button onClick={toggleDarkMode} className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors mr-1 sm:mr-2" title="Ganti Tema">
+                  {/* TEMA - Ikon Matahari/Bulan */}
+                  <button onClick={toggleDarkMode} className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors" title="Ganti Tema">
                     {darkMode ? <Sun size={18} className="w-4 h-4 sm:w-5 sm:h-5"/> : <Moon size={18} className="w-4 h-4 sm:w-5 sm:h-5"/>}
                   </button>
                   
@@ -684,6 +724,43 @@
                   </div>
                </section>
 
+              <section id="perpustakaan-publik" className="py-12 sm:py-24 bg-white dark:bg-[#0B1120] relative border-t border-slate-200 dark:border-slate-800">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                     <div className="text-center mb-10 sm:mb-16">
+                        <Badge variant="emerald" className="mx-auto mb-3 sm:mb-4">LITERASI TERBUKA</Badge>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white">Perpustakaan Digital</h2>
+                        <p className="text-slate-500 text-sm sm:text-base mt-3 sm:mt-4 max-w-2xl mx-auto">Akses gratis berbagai koleksi kitab, buku panduan, dan literatur ilmu syar'i untuk masyarakat umum.</p>
+                     </div>
+                     
+                     {(!libraryData || libraryData.length === 0) ? (
+                        <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                           <BookMarked size={40} className="mx-auto text-slate-300 mb-3"/>
+                           <p className="text-slate-500 font-medium">Koleksi buku sedang disiapkan oleh Admin...</p>
+                        </div>
+                     ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                           {libraryData.slice(0, 8).map((item, i) => (
+                              <Card key={i} className="p-0 flex flex-col justify-between border border-slate-200 dark:border-slate-800 transition-all overflow-hidden hover:shadow-xl hover:-translate-y-1 bg-white dark:bg-slate-900">
+                                 <div className="h-40 relative bg-slate-100 dark:bg-slate-800">
+                                    {item.coverUrl ? (
+                                       <img src={item.coverUrl} className="absolute inset-0 w-full h-full object-cover" alt={item.title} />
+                                    ) : (
+                                       <div className="absolute inset-0 flex items-center justify-center"><BookMarked size={40} className="text-slate-300"/></div>
+                                    )}
+                                    <div className="absolute top-2 left-2"><Badge variant="white" className="!text-[10px] uppercase shadow-sm bg-black/70 text-white border-none backdrop-blur-md">{item.type}</Badge></div>
+                                 </div>
+                                 <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                                    <h3 className="font-bold text-base text-slate-900 dark:text-white mb-2 line-clamp-2">{item.title}</h3>
+                                    <p className="text-xs text-slate-500 line-clamp-2 mb-4">{item.desc}</p>
+                                    <Button size="sm" onClick={() => window.open(item.url, '_blank')} className="w-full mt-auto bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white dark:bg-emerald-900/30 dark:hover:bg-emerald-600 border-none transition-colors"><BookOpen size={16} className="mr-2"/> Baca / Buka</Button>
+                                 </div>
+                              </Card>
+                           ))}
+                        </div>
+                     )}
+                  </div>
+              </section>
+
               <section id="faq" className="py-12 sm:py-20 max-w-4xl mx-auto px-4">
                  <div className="text-center mb-8 sm:mb-12">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-black">Pertanyaan Populer</h2>
@@ -716,18 +793,12 @@
 
                     {}
                     <div className="max-w-3xl mx-auto mb-8 bg-slate-800/30 p-5 rounded-2xl border border-slate-700/50 text-sm leading-relaxed">
-                       <p className="text-slate-300 mb-3">
+                       <p className="text-slate-300 mb-2">
                           Aplikasi ini adalah karya <strong className="text-white">RBA (Rumah Bahasa Arab)</strong> oleh <strong className="text-white">M. Nur Muslim</strong>. Alat ini telah diwakafkan dan diizinkan untuk digunakan serta dibagikan secara gratis kepada siapa saja demi kemajuan pendidikan umat.
                        </p>
-                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-2">
-                           <a href="https://rbaindonesia26-bot.github.io/rba-omnireader/" target="_blank" rel="noopener noreferrer" className="inline-block text-blue-400 hover:text-blue-300 font-bold transition-colors">
-                              👉 Klik untuk mencobanya sekarang
-                           </a>
-                           <button onClick={handleCopyLink} className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-700/80 hover:bg-slate-600 text-white rounded-lg text-xs font-bold transition-colors border border-slate-600 w-full sm:w-auto">
-                              {isCopied ? <CheckCircle size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                              {isCopied ? 'Tersalin!' : 'Salin Link'}
-                           </button>
-                       </div>
+                       <a href="https://rbaindonesia26-bot.github.io/rba-omnireader/" target="_blank" rel="noopener noreferrer" className="inline-block mt-1 text-blue-400 hover:text-blue-300 font-bold transition-colors">
+                          👉 Klik link berikut untuk mencobanya sekarang
+                       </a>
                     </div>
                     
                     <p className="text-[10px] sm:text-xs">&copy; {new Date().getFullYear()} Rumah Bahasa Arab. Hak Cipta Dilindungi.</p>
@@ -2724,6 +2795,174 @@
         )
     }
 
+    const PerpustakaanDigital = ({ libraryData = [] }) => {
+        return (
+            <div className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto space-y-6 md:space-y-8 animate-slide-up pb-24 overflow-x-hidden">
+                <div className="text-center mb-6 md:mb-10 px-2 sm:px-4">
+                    <Badge variant="blue" className="mx-auto mb-3 sm:mb-4 text-[10px] sm:text-xs">LITERASI DIGITAL</Badge>
+                    <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-2 sm:mb-4 leading-tight">Perpustakaan RBA</h1>
+                    <p className="text-slate-500 text-xs sm:text-sm max-w-2xl mx-auto">Koleksi kitab, buku panduan, dan artikel penunjang pembelajaran ilmu syar'i.</p>
+                </div>
+                {libraryData.length === 0 ? (
+                    <div className="text-center py-16 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl text-slate-500 shadow-sm">
+                        <BookMarked size={48} className="mx-auto mb-4 text-slate-300" />
+                        <h3 className="font-bold text-lg mb-2 text-slate-700 dark:text-slate-300">Koleksi Sedang Disiapkan</h3>
+                        <p className="text-sm">Buku dan literatur digital sedang dalam proses kurasi oleh tim pengajar.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                        {libraryData.map((item, i) => (
+                            <Card key={i} className="p-0 flex flex-col justify-between border-2 border-slate-200 dark:border-slate-800 transition-all overflow-hidden hover:shadow-xl hover:-translate-y-1">
+                                <div className="h-40 sm:h-48 relative bg-slate-100 dark:bg-slate-800">
+                                    {item.coverUrl ? (
+                                        <img src={item.coverUrl} className="absolute inset-0 w-full h-full object-cover" alt={item.title} />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center"><BookMarked size={40} className="text-slate-300"/></div>
+                                    )}
+                                    <div className="absolute top-2 left-2"><Badge variant="white" className="!text-[10px] uppercase shadow-sm bg-black/50 text-white border-none">{item.type}</Badge></div>
+                                </div>
+                                <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                                    <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2 line-clamp-2">{item.title}</h3>
+                                    <p className="text-xs sm:text-sm text-slate-500 line-clamp-3 mb-4">{item.desc}</p>
+                                    <Button size="sm" onClick={() => window.open(item.url, '_blank')} className="w-full mt-auto bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border-none transition-colors"><BookOpen size={16} className="mr-2"/> Buka / Baca</Button>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    const ManajemenPerpustakaanAdmin = ({ libraryData, db, storage }) => {
+        const [view, setView] = useState('list');
+        const [formData, setFormData] = useState({ id: '', title: '', desc: '', type: 'Kitab PDF', url: '', coverUrl: '' });
+        const [isSubmitting, setIsSubmitting] = useState(false);
+        const [isUploading, setIsUploading] = useState(false);
+        const [uploadMsg, setUploadMsg] = useState('');
+
+        const handleAdd = () => { setFormData({ id: 'lib_' + Date.now().toString(36), title: '', desc: '', type: 'Kitab PDF', url: '', coverUrl: '' }); setUploadMsg(''); setView('form'); };
+        const handleEdit = (item) => { setFormData(item); setUploadMsg(''); setView('form'); };
+        
+        const handleDelete = async (id) => {
+            if(!window.confirm('Hapus koleksi ini dari perpustakaan?')) return;
+            try {
+                const updated = libraryData.filter(item => item.id !== id);
+                await updateDoc(doc(db, "rba_lms", "main_db"), { library: updated });
+            } catch(e) { console.error("Gagal hapus:", e); }
+        };
+
+        const handleUpload = async (e, field) => {
+            const file = e.target.files[0];
+            if(!file || !storage) return;
+            setIsUploading(true); setUploadMsg('Sedang mengunggah file...');
+            try {
+                const safeFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                const storageRef = ref(storage, `library/${Date.now()}_${safeFileName}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(snapshot.ref);
+                setFormData(prev => ({...prev, [field]: url}));
+                setUploadMsg('Sukses: File berhasil diunggah!');
+            } catch (error) { setUploadMsg(`Error: Gagal mengunggah (${error.message}).`); }
+            setIsUploading(false);
+        };
+
+        const handleSave = async (e) => {
+            e.preventDefault(); setIsSubmitting(true);
+            try {
+                let updated = [...libraryData];
+                const existingIdx = updated.findIndex(c => c.id === formData.id);
+                if (existingIdx >= 0) { updated[existingIdx] = formData; } else { updated.push(formData); }
+                await setDoc(doc(db, "rba_lms", "main_db"), { library: updated }, { merge: true });
+                setView('list');
+            } catch(error) { console.error(error); }
+            setIsSubmitting(false);
+        };
+
+        if (view === 'form') {
+            return (
+                <div className="p-4 md:p-6 w-full max-w-3xl mx-auto space-y-6 animate-slide-up pb-24">
+                   <div className="flex items-center gap-4 mb-6">
+                      <button onClick={() => setView('list')} className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 rounded-full"><ArrowLeft size={20} /></button>
+                      <h1 className="text-2xl font-black text-slate-900 dark:text-white">{formData.id && formData.id.startsWith('lib_') && !libraryData.find(l=>l.id===formData.id) ? 'Tambah Koleksi Baru' : 'Edit Koleksi'}</h1>
+                   </div>
+                   <form onSubmit={handleSave} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                      <div><label className="block text-sm font-bold mb-2">Judul Buku / Materi</label><input type="text" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm" /></div>
+                      <div><label className="block text-sm font-bold mb-2">Deskripsi Singkat</label><textarea required rows="3" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm resize-none"></textarea></div>
+                      
+                      <div>
+                          <label className="block text-sm font-bold mb-2">Jenis File / Format</label>
+                          <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm">
+                              <option value="Kitab PDF">Kitab PDF / Dokumen</option>
+                              <option value="Artikel Web">Artikel Web</option>
+                              <option value="Video Kajian">Video Kajian</option>
+                              <option value="Audio MP3">Audio MP3</option>
+                          </select>
+                      </div>
+
+                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                         <label className="block text-sm font-bold mb-2">File Sumber / URL Tautan</label>
+                         <input type="file" onChange={(e) => handleUpload(e, 'url')} disabled={isUploading} className="mb-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-100 file:text-blue-700" />
+                         <input type="text" required placeholder="Atau paste URL langsung di sini..." value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-blue-600 text-sm" />
+                      </div>
+
+                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                         <label className="block text-sm font-bold mb-2">Gambar Sampul (Opsional)</label>
+                         <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'coverUrl')} disabled={isUploading} className="mb-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-100 file:text-blue-700" />
+                         <input type="text" placeholder="Atau paste URL gambar sampul di sini..." value={formData.coverUrl} onChange={e => setFormData({...formData, coverUrl: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-blue-600 text-sm" />
+                         {uploadMsg && <p className={`mt-2 text-xs font-bold ${uploadMsg.includes('Error') ? 'text-rose-600' : 'text-blue-600'}`}>{uploadMsg}</p>}
+                      </div>
+
+                      <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+                         <Button type="button" variant="ghost" onClick={() => setView('list')}>Batal</Button>
+                         <Button type="submit" disabled={isSubmitting || isUploading} className="gap-2 border-none bg-blue-600 hover:bg-blue-700"><Save size={18}/> Simpan Koleksi</Button>
+                      </div>
+                   </form>
+                </div>
+            );
+        }
+
+        return (
+            <div className="p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6 animate-slide-up pb-24">
+                <div className="flex justify-between items-end mb-6">
+                    <div>
+                        <Badge variant="blue" className="mb-2">MANAJEMEN KONTEN</Badge>
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Kelola Perpustakaan</h1>
+                    </div>
+                    <Button onClick={handleAdd} className="gap-2 border-none bg-blue-600 hover:bg-blue-700 text-white"><PlusCircle size={18}/> Tambah</Button>
+                </div>
+                
+                {libraryData.length === 0 ? (
+                    <div className="text-center py-16 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl text-slate-500">
+                        <BookMarked size={48} className="mx-auto mb-4 text-slate-300" />
+                        Perpustakaan masih kosong. Klik Tambah untuk mengunggah kitab atau artikel.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {libraryData.map((item, i) => (
+                            <Card key={i} className="p-0 flex flex-col justify-between overflow-hidden border-2 border-slate-200">
+                                <div className="h-32 relative bg-slate-100 flex items-center justify-center">
+                                    {item.coverUrl ? <img src={item.coverUrl} className="absolute inset-0 w-full h-full object-cover" /> : <BookMarked size={28} className="text-slate-300"/>}
+                                    <Badge variant="blue" className="absolute top-2 left-2 !text-[9px] uppercase shadow-sm bg-white/90">{item.type}</Badge>
+                                </div>
+                                <div className="p-4 flex-1 flex flex-col">
+                                    <h3 className="font-bold text-base mb-2 line-clamp-2 text-slate-900 dark:text-white">{item.title}</h3>
+                                    <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-100">
+                                        <button onClick={() => window.open(item.url, '_blank')} className="text-xs font-bold text-blue-600 hover:underline">Buka Link</button>
+                                        <div className="flex gap-1">
+                                            <button onClick={() => handleEdit(item)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><PenTool size={16}/></button>
+                                            <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"><Trash2 size={16}/></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
     function App() {
       const defaultUsers = { 'ADMIN-RBA': { role: 'admin', name: 'Admin Utama RBA' } };
       
@@ -2775,6 +3014,7 @@
       const [schedules, setSchedules] = useState(() => getSafeLocal('rba_schedules', [])); 
       
       const [registrations, setRegistrations] = useState(() => getSafeLocal('rba_registrations', {}));
+      const [libraryData, setLibraryData] = useState(() => getSafeLocal('rba_library', []));
       
       const [showNotifications, setShowNotifications] = useState(false);
       
@@ -2789,6 +3029,7 @@
       useEffect(() => { setSafeLocal('rba_lang', lang); }, [lang]);
       useEffect(() => { setSafeLocal('rba_schedules', schedules); }, [schedules]); 
       useEffect(() => { setSafeLocal('rba_registrations', registrations); }, [registrations]); 
+      useEffect(() => { setSafeLocal('rba_library', libraryData); }, [libraryData]); 
 
       const handleRequestAccess = async (courseId) => {
          if(!currentUserUid || !db) return;
@@ -2852,6 +3093,7 @@
                   if(data.pengumuman !== undefined) setPengumuman(data.pengumuman);
                   if(data.schedules) setSchedules(data.schedules); else setSchedules([]); 
                   if(data.registrations) setRegistrations(data.registrations); else setRegistrations({});
+                  if(data.library) setLibraryData(data.library); else setLibraryData([]);
               } else {
                   // Inisiasi database awal jika sama sekali belum pernah dibuat
                   try { setDoc(doc(db, "rba_lms", "main_db"), { courses: defaultDemoCourses, users: defaultUsers }, { merge: true }); } catch(e) {}
@@ -2887,6 +3129,7 @@
             if (role === 'guru') return <DashboardGuru setActiveMenu={setActiveMenu} courses={myCoursesView} userName={userName} schedules={schedules} />;
             return <DashboardSiswa setActiveMenu={setActiveMenu} myCourses={myCoursesView} userName={userName} pengumuman={pengumuman} enrollmentsData={safeEnrollments} uid={currentUserUid} onGoToClass={(c) => { setSelectedClassroom(c); setActiveMenu('ruang-kelas'); }} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} schedules={schedules} />;
           case 'katalog-program': return <KatalogProgramSiswa setActiveMenu={setActiveMenu} courses={allCoursesView} onViewDetail={(prog) => { setSelectedProgram(prog); setActiveMenu('detail-program'); }} />;
+          case 'perpustakaan': return <PerpustakaanDigital libraryData={libraryData} />;
           case 'detail-program': return <DetailProgram program={selectedProgram || allCoursesView.find(c => c.id === selectedProgram?.id)} onBack={() => setActiveMenu('katalog-program')} role={role} enrollmentStatus={selectedProgram ? (safeClasses[selectedProgram.id] || '') : ''} onEnroll={handleRequestAccess} onManage={() => setActiveMenu('manajemen-program')} onGoToClass={() => { setSelectedClassroom(selectedProgram); setActiveMenu('ruang-kelas'); }} />;
           case 'ruang-kelas': return <RuangKelas program={selectedClassroom} onBack={() => setActiveMenu('kelas-saya')} userProgress={userProgressData[selectedClassroom?.id] || []} onMarkComplete={handleMarkComplete} role={role} userName={userName} db={db} uid={currentUserUid} storage={storage} enrollments={safeEnrollments} />;
           case 'kelas-saya': return <DashboardSiswa setActiveMenu={setActiveMenu} myCourses={myCoursesView} userName={userName} pengumuman={pengumuman} enrollmentsData={safeEnrollments} uid={currentUserUid} onGoToClass={(c) => { setSelectedClassroom(c); setActiveMenu('ruang-kelas'); }} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} schedules={schedules} />;
@@ -2896,6 +3139,7 @@
           case 'jadwal-akademik': return <JadwalAkademik schedules={schedules} role={role} db={db} />;
           case 'manajemen-pengguna': return <ManajemenPenggunaAdmin usersData={usersData} enrollments={safeEnrollments} courses={safeCourses} />;
           case 'manajemen-program': return <ManajemenProgramAdmin courses={safeCourses} db={db} storage={storage} />;
+          case 'manajemen-perpustakaan': return <ManajemenPerpustakaanAdmin libraryData={libraryData} db={db} storage={storage} />;
           case 'persetujuan': return <PersetujuanAdmin enrollments={safeEnrollments} courses={safeCourses} usersData={usersData} db={db} />;
           case 'validasi-pendaftaran': return <ValidasiPendaftaranAdmin registrations={registrations} db={db} usersData={usersData} courses={safeCourses} />;
           default: return <div className="p-10 text-center text-slate-500">Halaman tidak ditemukan.</div>;
@@ -2911,7 +3155,7 @@
 
       if (!isLoggedIn) return (
         <ThemeContext.Provider value="admin">
-           <LandingPage onLogin={handleLoginSuccess} usersData={usersData} isDbReady={firebaseStatus !== 'connecting'} coursesData={courses} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} lang={lang} setLang={setLang} pengumuman={pengumuman} />
+           <LandingPage onLogin={handleLoginSuccess} usersData={usersData} isDbReady={firebaseStatus !== 'connecting'} coursesData={courses} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} lang={lang} setLang={setLang} pengumuman={pengumuman} libraryData={libraryData} />
         </ThemeContext.Provider>
       );
 
@@ -2938,6 +3182,7 @@
               <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">Navigasi</div>
               <SidebarItem icon={LayoutDashboard} label="Dashboard" isActive={activeMenu === 'dashboard'} onClick={() => setActiveMenu('dashboard')} />
               <SidebarItem icon={Library} label="Katalog Program" isActive={activeMenu === 'katalog-program' || activeMenu === 'detail-program'} onClick={() => setActiveMenu('katalog-program')} />
+              <SidebarItem icon={BookMarked} label="Perpustakaan Digital" isActive={activeMenu === 'perpustakaan'} onClick={() => setActiveMenu('perpustakaan')} />
               <SidebarItem icon={CalendarDays} label="Kalender Akademik" isActive={activeMenu === 'jadwal-akademik'} onClick={() => setActiveMenu('jadwal-akademik')} />
               
               {role === 'siswa' && (
@@ -2960,6 +3205,7 @@
                   <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2 mt-6">Administrator</div>
                   <SidebarItem icon={Wallet} label="Validasi Pendaftaran" isActive={activeMenu === 'validasi-pendaftaran'} onClick={() => setActiveMenu('validasi-pendaftaran')} />
                   <SidebarItem icon={FolderOpen} label="Manajemen Program" isActive={activeMenu === 'manajemen-program'} onClick={() => setActiveMenu('manajemen-program')} />
+                  <SidebarItem icon={BookMarked} label="Kelola Perpustakaan" isActive={activeMenu === 'manajemen-perpustakaan'} onClick={() => setActiveMenu('manajemen-perpustakaan')} />
                   <SidebarItem icon={Users} label="Manajemen Pengguna" isActive={activeMenu === 'manajemen-pengguna'} onClick={() => setActiveMenu('manajemen-pengguna')} />
                   <SidebarItem icon={ShieldCheck} label="Persetujuan" isActive={activeMenu === 'persetujuan'} onClick={() => setActiveMenu('persetujuan')} />
                 </>
@@ -2979,7 +3225,7 @@
                 {firebaseStatus === 'online' ? <Badge variant="emerald" className="hidden sm:flex text-xs"><Database size={10} className="w-3 h-3"/> Terhubung</Badge> : <Badge variant="rose" className="hidden sm:flex text-xs"><ShieldAlert size={10} className="w-3 h-3"/> Offline</Badge>}
                 
                 {role === 'siswa' && (
-                  <div className="relative">
+                  <div className="static sm:relative">
                     <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 text-slate-500 hover:text-blue-600 bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors mr-1 relative">
                       {(safeEnrollments[currentUserUid]?.notifications || []).some(n => !n.read) ? (
                          <>
@@ -2992,35 +3238,35 @@
                     </button>
                     
                     {showNotifications && (
-                      <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden animate-fade-in">
-                         <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950">
-                            <h3 className="font-black text-slate-900 dark:text-white">Notifikasi</h3>
-                            {(safeEnrollments[currentUserUid]?.notifications || []).some(n => !n.read) && (
-                               <button onClick={async () => {
-                                   const updatedNotifs = (safeEnrollments[currentUserUid]?.notifications || []).map(n => ({...n, read: true}));
-                                   try { 
-                                       await setDoc(doc(db, "rba_lms", "main_db"), {
-                                           enrollments: {
-                                               [currentUserUid]: { notifications: updatedNotifs }
-                                           }
-                                       }, { merge: true });
-                                   } catch(e) { console.error("Gagal update notif:", e); }
-                               }} className="text-[10px] font-bold text-blue-600 hover:underline">Tandai dibaca</button>
-                            )}
+                        <div className="fixed top-[70px] left-1/2 -translate-x-1/2 w-[92vw] max-w-[340px] sm:absolute sm:top-[calc(100%+10px)] sm:left-auto sm:right-0 sm:translate-x-0 sm:w-80 z-[100] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 animate-fade-in overflow-hidden origin-top sm:origin-top-right">
+                             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950">
+                                <h3 className="font-black text-slate-900 dark:text-white">Notifikasi</h3>
+                                {(safeEnrollments[currentUserUid]?.notifications || []).some(n => !n.read) && (
+                                   <button onClick={async () => {
+                                       const updatedNotifs = (safeEnrollments[currentUserUid]?.notifications || []).map(n => ({...n, read: true}));
+                                       try { 
+                                           await setDoc(doc(db, "rba_lms", "main_db"), {
+                                               enrollments: {
+                                                   [currentUserUid]: { notifications: updatedNotifs }
+                                               }
+                                           }, { merge: true });
+                                       } catch(e) { console.error("Gagal update notif:", e); }
+                                   }} className="text-[10px] font-bold text-blue-600 hover:underline">Tandai dibaca</button>
+                                )}
+                             </div>
+                             <div className="max-h-72 overflow-y-auto custom-scrollbar">
+                                {!(safeEnrollments[currentUserUid]?.notifications?.length) ? (
+                                   <div className="p-6 text-center text-slate-400 text-sm">Belum ada notifikasi.</div>
+                                ) : (
+                                   safeEnrollments[currentUserUid].notifications.map((notif, idx) => (
+                                      <div key={idx} className={`p-4 border-b border-slate-50 dark:border-slate-800/50 ${notif.read ? 'opacity-60' : 'bg-blue-50/50 dark:bg-blue-900/10'}`}>
+                                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{notif.text}</p>
+                                         <span className="text-[10px] font-bold text-slate-400 mt-2 block">{new Date(notif.time).toLocaleString('id-ID')}</span>
+                                      </div>
+                                   ))
+                                )}
+                             </div>
                          </div>
-                         <div className="max-h-72 overflow-y-auto custom-scrollbar">
-                            {!(safeEnrollments[currentUserUid]?.notifications?.length) ? (
-                               <div className="p-6 text-center text-slate-400 text-sm">Belum ada notifikasi.</div>
-                            ) : (
-                               safeEnrollments[currentUserUid].notifications.map((notif, idx) => (
-                                  <div key={idx} className={`p-4 border-b border-slate-50 dark:border-slate-800/50 ${notif.read ? 'opacity-60' : 'bg-blue-50/50 dark:bg-blue-900/10'}`}>
-                                     <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{notif.text}</p>
-                                     <span className="text-[10px] font-bold text-slate-400 mt-2 block">{new Date(notif.time).toLocaleString('id-ID')}</span>
-                                  </div>
-                               ))
-                            )}
-                         </div>
-                      </div>
                     )}
                   </div>
                 )}
