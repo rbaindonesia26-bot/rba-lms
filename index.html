@@ -8,13 +8,13 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <title>RBA LMS Enterprise</title>
+  <title>Rumah Bahasa Arab</title>
   
   <!-- PWA Meta Tags (Aman untuk iOS & Android) -->
   <meta name="theme-color" content="#0B1120">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="RBA LMS">
+  <meta name="apple-mobile-web-app-title" content="Rumah Bahasa Arab">
   <link rel="apple-touch-icon" href="https://i.ibb.co.com/Tx2C8J3Y/ENSIKLOPEDIA-39.png">
   
   <!-- PWA Injector Script (Dibungkus Try-Catch agar tidak bisa merusak sistem utama) -->
@@ -22,8 +22,8 @@
     try {
       // 1. Membangun File Manifest (Buku Petunjuk PWA) secara aman
       const manifest = {
-        name: "Rumah Bahasa Arab LMS",
-        short_name: "RBA LMS",
+        name: "Rumah Bahasa Arab",
+        short_name: "RBA",
         description: "Platform Belajar RBA",
         start_url: "./?source=pwa",
         display: "standalone",
@@ -437,7 +437,7 @@
       const faqs = [
         { q: "Bagaimana mendapatkan Token?", a: "Pilih menu Daftar Sekarang dan ikuti petunjuk pendaftaran. Setelah diverifikasi Admin, Anda akan menerima Token rahasia melalui WhatsApp." },
         { q: "Apakah ada sertifikat?", a: "Ya, peserta akan mendapatkan e-sertifikat resmi setelah menyelesaikan program dan lulus ujian evaluasi." },
-        { q: "Apakah bisa lewat HP?", a: "Tentu! Platform RBA LMS dirancang 100% responsif sehingga sangat nyaman digunakan melalui HP, Tablet, maupun Laptop." },
+        { q: "Apakah bisa lewat HP?", a: "Tentu! Platform Rumah Bahasa Arab dirancang 100% responsif sehingga sangat nyaman digunakan melalui HP, Tablet, maupun Laptop." },
         { q: "Apakah ada sanad?", a: "Ya, kami menyediakan Program Bersanad khusus bagi peserta tingkat lanjut yang memenuhi kriteria untuk mengambil jalur riwayat kitab." }
       ];
 
@@ -986,7 +986,7 @@
                 let waNumber = regData.wa.replace(/\D/g, '');
                 if(waNumber.startsWith('0')) waNumber = '62' + waNumber.substring(1);
                 
-                const textWa = `*KARTU AKSES RBA LMS* 🎓\n\nAssalamu'alaikum, Kak ${regData.nama}.\n\nAlhamdulillah, pendaftaran Anda untuk program *${regData.program}* telah kami verifikasi. Akses kelas Anda resmi diterbitkan!\n\n🔑 *Token (PIN):* *${newToken}*\n\n*Cara Masuk:*\n1. Buka tautan RBA LMS.\n2. Klik tombol "Masuk".\n3. Ketikkan Nama dan Token (PIN) di atas secara persis huruf besarnya.\n\nSelamat belajar di Rumah Bahasa Arab!`;
+                const textWa = `*KARTU AKSES RUMAH BAHASA ARAB* 🎓\n\nAssalamu'alaikum, Kak ${regData.nama}.\n\nAlhamdulillah, pendaftaran Anda untuk program *${regData.program}* telah kami verifikasi. Akses kelas Anda resmi diterbitkan!\n\n🔑 *Token (PIN):* *${newToken}*\n\n*Cara Masuk:*\n1. Buka tautan Rumah Bahasa Arab.\n2. Klik tombol "Masuk".\n3. Ketikkan Nama dan Token (PIN) di atas secara persis huruf besarnya.\n\nSelamat belajar di Rumah Bahasa Arab!`;
                 
                 window.open(`https://api.whatsapp.com/send?phone=${waNumber}&text=${encodeURIComponent(textWa)}`, '_blank');
 
@@ -1630,7 +1630,7 @@
       };
 
       const handleSendWa = (user) => {
-         const text = `*KARTU AKSES RBA LMS* 🎓\n\nAssalamu'alaikum, ${user.name || 'Calon Peserta'}.\n\nAkses masuk kelas pembelajaran Anda telah resmi diterbitkan. Harap simpan informasi rahasia ini:\n\n👤 *Nama:* ${user.name || '-'}\n🔑 *Token (PIN):* *${user.token}*\n🔰 *Status:* ${user.role.toUpperCase()}\n\n*Cara Masuk:*\n1. Buka tautan website RBA LMS.\n2. Klik tombol "Masuk" di pojok kanan.\n3. Ketikkan Nama dan Token (PIN) di atas secara presisi (huruf besar/kecil berpengaruh).\n\n_Mohon untuk tidak membagikan Token ini kepada pihak lain demi keamanan akun Anda._\n\nSelamat belajar!`;
+         const text = `*KARTU AKSES RUMAH BAHASA ARAB* 🎓\n\nAssalamu'alaikum, ${user.name || 'Calon Peserta'}.\n\nAkses masuk kelas pembelajaran Anda telah resmi diterbitkan. Harap simpan informasi rahasia ini:\n\n👤 *Nama:* ${user.name || '-'}\n🔑 *Token (PIN):* *${user.token}*\n🔰 *Status:* ${user.role.toUpperCase()}\n\n*Cara Masuk:*\n1. Buka tautan website Rumah Bahasa Arab.\n2. Klik tombol "Masuk" di pojok kanan.\n3. Ketikkan Nama dan Token (PIN) di atas secara presisi (huruf besar/kecil berpengaruh).\n\n_Mohon untuk tidak membagikan Token ini kepada pihak lain demi keamanan akun Anda._\n\nSelamat belajar!`;
          
          const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
          window.open(whatsappUrl, '_blank');
@@ -1744,7 +1744,7 @@
                       <div className="bg-gradient-to-br from-slate-900 via-[#0f172a] to-blue-950 p-6 md:p-8 relative overflow-hidden">
                          <div className="absolute -right-6 -bottom-6 text-white/5 rotate-12"><ShieldCheck size={180}/></div>
                          <div className="flex justify-between items-start relative z-10 mb-8">
-                             <div><h2 className="text-xl font-black text-white tracking-tight mb-1">RBA LMS</h2><p className="text-[10px] text-blue-300 font-bold tracking-widest uppercase">Official Access Pass</p></div>
+                             <div><h2 className="text-xl font-black text-white tracking-tight mb-1">Rumah Bahasa Arab</h2><p className="text-[10px] text-blue-300 font-bold tracking-widest uppercase">Official Access Pass</p></div>
                              <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div><span className="text-[10px] font-bold text-white uppercase">{showShareModal.role}</span></div>
                          </div>
                          <div className="relative z-10 bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
@@ -2256,7 +2256,7 @@
       };
 
       const handleSendWaPersetujuan = (req) => {
-          const text = `Assalamu'alaikum ${req.userName},\n\nAlhamdulillah, permintaan akses Anda untuk kelas *${req.courseTitle}* telah kami *SETUJUI* ✅.\n\nSilakan login ke RBA LMS menggunakan Token Anda (${req.userToken}) untuk mulai belajar.\n\nSelamat belajar!`;
+          const text = `Assalamu'alaikum ${req.userName},\n\nAlhamdulillah, permintaan akses Anda untuk kelas *${req.courseTitle}* telah kami *SETUJUI* ✅.\n\nSilakan login ke portal Rumah Bahasa Arab menggunakan Token Anda (${req.userToken}) untuk mulai belajar.\n\nSelamat belajar!`;
           window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
       };
 
@@ -2763,7 +2763,7 @@
                         <div>
                             <div className="flex justify-center items-center gap-3 mb-6">
                                 <img src="https://i.ibb.co.com/Tx2C8J3Y/ENSIKLOPEDIA-39.png" alt="Logo" className="h-16" />
-                                <div className="text-left"><h2 className="text-xl font-black text-slate-900 tracking-wider">RUMAH BAHASA ARAB</h2><p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Learning Management System</p></div>
+                                <div className="text-left"><h2 className="text-xl font-black text-slate-900 tracking-wider">RUMAH BAHASA ARAB</h2><p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Platform Belajar Interaktif</p></div>
                             </div>
                             <h1 className="text-4xl sm:text-6xl text-amber-500 mb-2 mt-4 tracking-widest font-serif" style={{ fontFamily: "'Merriweather', serif" }}>SERTIFIKAT</h1>
                             <p className="text-sm font-bold text-slate-400 tracking-widest uppercase mb-10">Penghargaan Pencapaian Akademik</p>
@@ -3176,7 +3176,7 @@
           <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[70vw] sm:w-72 max-w-xs bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} print:hidden`}>
             <div className="h-16 sm:h-20 flex items-center gap-3 px-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
                  <img src="https://i.ibb.co.com/Tx2C8J3Y/ENSIKLOPEDIA-39.png" alt="RBA" className="h-8 w-auto" />
-                 <span className="font-black text-lg tracking-tight truncate">RBA LMS</span>
+                 <span className="font-black text-base sm:text-lg tracking-tight truncate">Rumah Bahasa Arab</span>
             </div>
             <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 custom-scrollbar">
               <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">Navigasi</div>
