@@ -567,7 +567,7 @@
                     </span>
                   </h1>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mt-4 sm:mt-6 px-2 sm:px-0">
-                    Belajar secara bertahap mulai dari Nahwu, Sharaf, Balaghah, Tafsir, Musthalah Hadits, hingga <span className="font-bold text-amber-600 dark:text-amber-500">Program Bersanad</span>.
+                    Kuasai fondasi ilmu alat bahasa Arab dan ilmu syar'i secara komprehensif. Dapatkan akses ke <span className="font-bold text-amber-600 dark:text-amber-500">Program Bersanad</span> serta ragam <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-[#06B6D4] to-[#10B981]">aplikasi teknologi interaktif</span> penunjang pendidikan umat.
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 pt-6 sm:pt-8 px-4 sm:px-0">
                     <Button size="lg" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 text-sm sm:text-base h-12 sm:h-14 gap-2 px-6 sm:px-8 rounded-xl font-bold transition-transform hover:-translate-y-0.5" onClick={() => setShowRegModal(true)}>
@@ -729,7 +729,7 @@
                      <div className="text-center mb-10 sm:mb-16">
                         <Badge variant="emerald" className="mx-auto mb-3 sm:mb-4">LITERASI TERBUKA</Badge>
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white">Perpustakaan Digital</h2>
-                        <p className="text-slate-500 text-sm sm:text-base mt-3 sm:mt-4 max-w-2xl mx-auto">Akses gratis berbagai koleksi kitab, buku panduan, dan literatur ilmu syar'i untuk masyarakat umum.</p>
+                        <p className="text-slate-500 text-sm sm:text-base mt-3 sm:mt-4 max-w-2xl mx-auto">Nikmati akses gratis ke berbagai koleksi kitab, literatur ilmu syar'i, hingga ragam aplikasi edukatif yang bermanfaat untuk masyarakat umum.</p>
                      </div>
                      
                      {(!libraryData || libraryData.length === 0) ? (
@@ -794,11 +794,11 @@
                     {}
                     <div className="max-w-3xl mx-auto mb-8 bg-slate-800/30 p-5 rounded-2xl border border-slate-700/50 text-sm leading-relaxed">
                        <p className="text-slate-300 mb-2">
-                          Aplikasi ini adalah karya <strong className="text-white">RBA (Rumah Bahasa Arab)</strong> oleh <strong className="text-white">M. Nur Muslim</strong>. Alat ini telah diwakafkan dan diizinkan untuk digunakan serta dibagikan secara gratis kepada siapa saja demi kemajuan pendidikan umat.
+                          Aplikasi ini adalah mahakarya <strong className="text-white">Rumah Bahasa Arab</strong>. Platform teknologi ini telah diwakafkan dan diizinkan untuk digunakan serta dibagikan secara gratis kepada siapa saja demi kemajuan pendidikan umat.
                        </p>
-                       <a href="https://rbaindonesia26-bot.github.io/rba-omnireader/" target="_blank" rel="noopener noreferrer" className="inline-block mt-1 text-blue-400 hover:text-blue-300 font-bold transition-colors">
-                          👉 Klik link berikut untuk mencobanya sekarang
-                       </a>
+                       <button onClick={() => scrollToSection('perpustakaan-publik')} className="inline-block mt-1 text-blue-400 hover:text-blue-300 font-bold transition-colors cursor-pointer text-left">
+                          👉 Temukan koleksi aplikasi edukatif (seperti RBA OmniReader) di Perpustakaan Digital kami
+                       </button>
                     </div>
                     
                     <p className="text-[10px] sm:text-xs">&copy; {new Date().getFullYear()} Rumah Bahasa Arab. Hak Cipta Dilindungi.</p>
