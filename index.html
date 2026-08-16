@@ -1308,9 +1308,9 @@
         );
     };
 
-    const ProfilDanRapor = ({ uid, usersData, enrollmentsData, courses, onShowSertifikat }) => {
+    const ProfilDanRapor = ({ uid, currentUserToken, usersData, enrollmentsData, courses, onShowSertifikat }) => {
         const userList = Object.entries(usersData).map(([token, data]) => ({ token, ...data }));
-        const myUser = userList.find(u => u.uid === uid) || { name: 'Siswa RBA', token: 'UNKNOWN', role: 'siswa', createdAt: Date.now() };
+        const myUser = userList.find(u => u.token === currentUserToken) || { name: 'Siswa RBA', token: 'UNKNOWN', role: 'siswa', createdAt: Date.now() };
         
         const myEnrollments = enrollmentsData[uid]?.classes || {};
         const myProgress = enrollmentsData[uid]?.progress || {};
@@ -1695,7 +1695,7 @@
       };
 
       return (
-         <div className="p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6 animate-slide-up pb-24">
+         <div className="p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6 pb-24">
             <div className="mb-6">
                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight">Manajemen Pengguna</h1>
                <p className="text-slate-500 text-sm mt-1">Kelola token akses, rekap nilai, dan role pengguna sistem.</p>
@@ -3250,7 +3250,7 @@
           case 'kelas-saya': return <DashboardSiswa setActiveMenu={setActiveMenu} myCourses={myCoursesView} userName={userName} pengumuman={pengumuman} enrollmentsData={safeEnrollments} uid={currentUserUid} onGoToClass={(c) => { setSelectedClassroom(c); setActiveMenu('ruang-kelas'); }} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} schedules={schedules} />;
           case 'papan-peringkat': return <PapanPeringkat usersData={usersData} enrollments={safeEnrollments} courses={safeCourses} currentUserUid={currentUserUid} />;
           case 'sertifikat': return <SertifikatViewer course={selectedClassroom} userName={userName} onBack={() => setActiveMenu('profil')} />;
-          case 'profil': return <ProfilDanRapor uid={currentUserUid} usersData={usersData} enrollmentsData={safeEnrollments} courses={safeCourses} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} />;
+          case 'profil': return <ProfilDanRapor uid={currentUserUid} currentUserToken={currentUserToken} usersData={usersData} enrollmentsData={safeEnrollments} courses={safeCourses} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} />;
           case 'jadwal-akademik': return <JadwalAkademik schedules={schedules} role={role} db={db} />;
           case 'manajemen-pengguna': return <ManajemenPenggunaAdmin usersData={usersData} enrollments={safeEnrollments} courses={safeCourses} />;
           case 'manajemen-program': return <ManajemenProgramAdmin courses={safeCourses} db={db} storage={storage} />;
