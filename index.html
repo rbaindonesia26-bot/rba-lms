@@ -2963,6 +2963,97 @@
         );
     };
 
+    const InstallPrompt = () => {
+        const [showPrompt, setShowPrompt] = useState(false);
+        const [isIOS, setIsIOS] = useState(false);
+        const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+        useEffect(() => {
+            // Cek apakah sudah diinstal (Standalone mode)
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            if (isStandalone) return;
+
+            // Cek apakah user pernah menutup prompt ini sebelumnya agar tidak mengganggu
+            const hasDismissed = sessionStorage.getItem('rba_dismiss_install');
+            if (hasDismissed) return;
+
+            // Deteksi iOS Safari
+            const ua = window.navigator.userAgent;
+            const webkit = !!ua.match(/WebKit/i);
+            const isIPad = !!ua.match(/iPad/i);
+            const isIPhone = !!ua.match(/iPhone/i);
+            const isIOSDevice = isIPad || isIPhone;
+
+            if (isIOSDevice && webkit && !ua.match(/CriOS/i)) {
+                setIsIOS(true);
+                // Jeda 3 detik agar tidak mengagetkan saat baru buka
+                setTimeout(() => setShowPrompt(true), 3000);
+            }
+
+            // Deteksi Android / Chrome
+            const handleBeforeInstallPrompt = (e) => {
+                e.preventDefault();
+                setDeferredPrompt(e);
+                setTimeout(() => setShowPrompt(true), 3000);
+            };
+
+            window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+            return () => {
+                window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            };
+        }, []);
+
+        const handleInstallClick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    setShowPrompt(false);
+                }
+                setDeferredPrompt(null);
+            }
+        };
+
+        const handleDismiss = () => {
+            setShowPrompt(false);
+            sessionStorage.setItem('rba_dismiss_install', 'true');
+        };
+
+        if (!showPrompt) return null;
+
+        return (
+            <div className="fixed bottom-0 left-0 w-full z-[200] p-4 sm:p-6 animate-slide-up">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 sm:p-5 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center gap-4 max-w-3xl mx-auto relative overflow-hidden">
+                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+                        <button onClick={handleDismiss} className="text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 rounded-full p-1.5 transition-colors">
+                            <X size={16} />
+                        </button>
+                    </div>
+                    
+                    <img src="https://i.ibb.co.com/Tx2C8J3Y/ENSIKLOPEDIA-39.png" alt="Logo RBA" className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 drop-shadow-md" />
+                    
+                    <div className="flex-1 text-center sm:text-left pr-4">
+                        <h3 className="font-black text-slate-900 dark:text-white text-base sm:text-lg mb-1">Pasang Aplikasi RBA</h3>
+                        {isIOS ? (
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">Ketuk tombol <Share2 size={14} className="inline mx-1 text-blue-500"/> (Bagikan) di bawah, lalu pilih <strong>"Tambahkan ke Layar Utama"</strong> untuk akses super cepat.</p>
+                        ) : (
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">Pasang aplikasi ini ke Layar Utama HP Anda. Akses lebih cepat, ringan, dan hemat kuota.</p>
+                        )}
+                    </div>
+
+                    {!isIOS && (
+                        <div className="w-full sm:w-auto shrink-0 mt-3 sm:mt-0">
+                            <Button onClick={handleInstallClick} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 border-none whitespace-nowrap">
+                                <Download size={18} className="mr-2"/> Pasang Sekarang
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     function App() {
       const defaultUsers = { 'ADMIN-RBA': { role: 'admin', name: 'Admin Utama RBA' } };
       
@@ -3155,6 +3246,7 @@
 
       if (!isLoggedIn) return (
         <ThemeContext.Provider value="admin">
+           <InstallPrompt />
            <LandingPage onLogin={handleLoginSuccess} usersData={usersData} isDbReady={firebaseStatus !== 'connecting'} coursesData={courses} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} lang={lang} setLang={setLang} pengumuman={pengumuman} libraryData={libraryData} />
         </ThemeContext.Provider>
       );
@@ -3171,6 +3263,7 @@
 
       return (
         <ThemeContext.Provider value={role}>
+        <InstallPrompt />
         <div className="flex h-screen overflow-hidden w-full relative bg-slate-50 dark:bg-[#0B1120]">
           {isSidebarOpen && <div className="fixed inset-0 bg-slate-900/60 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)}></div>}
           <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[70vw] sm:w-72 max-w-xs bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} print:hidden`}>
