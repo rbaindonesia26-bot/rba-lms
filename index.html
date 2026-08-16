@@ -2977,41 +2977,48 @@
             const hasDismissed = sessionStorage.getItem('rba_dismiss_install');
             if (hasDismissed) return;
 
-            // Deteksi iOS Safari
+            // Deteksi jenis perangkat
             const ua = window.navigator.userAgent;
-            const webkit = !!ua.match(/WebKit/i);
-            const isIPad = !!ua.match(/iPad/i);
-            const isIPhone = !!ua.match(/iPhone/i);
-            const isIOSDevice = isIPad || isIPhone;
+            const isIOSDevice = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 
-            if (isIOSDevice && webkit && !ua.match(/CriOS/i)) {
+            // Hanya tampilkan banner jika diakses lewat HP/Tablet
+            if (!isMobile) return;
+
+            if (isIOSDevice) {
                 setIsIOS(true);
-                // Jeda 3 detik agar tidak mengagetkan saat baru buka
-                setTimeout(() => setShowPrompt(true), 3000);
             }
 
-            // Deteksi Android / Chrome
+            // PERBAIKAN: Paksa banner muncul setelah 3.5 detik di HP
+            // (Karena browser kadang memblokir trigger otomatis, kita tidak perlu menunggu sinyal dari browser)
+            const timerId = setTimeout(() => setShowPrompt(true), 3500);
+
+            // Deteksi Android / Chrome Native Prompt
             const handleBeforeInstallPrompt = (e) => {
                 e.preventDefault();
                 setDeferredPrompt(e);
-                setTimeout(() => setShowPrompt(true), 3000);
             };
 
             window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
             return () => {
+                clearTimeout(timerId);
                 window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
             };
         }, []);
 
         const handleInstallClick = async () => {
             if (deferredPrompt) {
+                // Gunakan cara asli jika browser mengizinkan
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     setShowPrompt(false);
                 }
                 setDeferredPrompt(null);
+            } else {
+                // JIKA BROWSER MEMBLOKIR POP-UP OTOMATIS: Beri petunjuk cerdas ke pengguna Android
+                alert("Browser Anda membutuhkan langkah manual untuk menginstal aplikasi ini.\n\nCARA PASANG:\n1. Ketuk ikon Menu (titik tiga ⋮) di pojok kanan atas browser.\n2. Pilih 'Tambahkan ke Layar Utama' (Add to Home screen) atau 'Instal Aplikasi'.");
             }
         };
 
