@@ -2967,33 +2967,27 @@
         const [showPrompt, setShowPrompt] = useState(false);
         const [isIOS, setIsIOS] = useState(false);
         const [deferredPrompt, setDeferredPrompt] = useState(null);
+        const [showManualGuide, setShowManualGuide] = useState(false); // State baru untuk Modal Panduan
 
         useEffect(() => {
-            // Cek apakah sudah diinstal (Standalone mode)
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
             if (isStandalone) return;
 
-            // Cek apakah user pernah menutup prompt ini sebelumnya agar tidak mengganggu
             const hasDismissed = sessionStorage.getItem('rba_dismiss_install');
             if (hasDismissed) return;
 
-            // Deteksi jenis perangkat
             const ua = window.navigator.userAgent;
             const isIOSDevice = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 
-            // Hanya tampilkan banner jika diakses lewat HP/Tablet
             if (!isMobile) return;
 
             if (isIOSDevice) {
                 setIsIOS(true);
             }
 
-            // PERBAIKAN: Paksa banner muncul setelah 3.5 detik di HP
-            // (Karena browser kadang memblokir trigger otomatis, kita tidak perlu menunggu sinyal dari browser)
             const timerId = setTimeout(() => setShowPrompt(true), 3500);
 
-            // Deteksi Android / Chrome Native Prompt
             const handleBeforeInstallPrompt = (e) => {
                 e.preventDefault();
                 setDeferredPrompt(e);
@@ -3009,7 +3003,6 @@
 
         const handleInstallClick = async () => {
             if (deferredPrompt) {
-                // Gunakan cara asli jika browser mengizinkan
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
@@ -3017,8 +3010,8 @@
                 }
                 setDeferredPrompt(null);
             } else {
-                // JIKA BROWSER MEMBLOKIR POP-UP OTOMATIS: Beri petunjuk cerdas ke pengguna Android
-                alert("Browser Anda membutuhkan langkah manual untuk menginstal aplikasi ini.\n\nCARA PASANG:\n1. Ketuk ikon Menu (titik tiga ⋮) di pojok kanan atas browser.\n2. Pilih 'Tambahkan ke Layar Utama' (Add to Home screen) atau 'Instal Aplikasi'.");
+                // PERBAIKAN PENTING: Gunakan UI Pop-up internal, BUKAN alert() agar tembus di Google Sites
+                setShowManualGuide(true);
             }
         };
 
@@ -3027,37 +3020,61 @@
             sessionStorage.setItem('rba_dismiss_install', 'true');
         };
 
-        if (!showPrompt) return null;
+        if (!showPrompt && !showManualGuide) return null;
 
         return (
-            <div className="fixed bottom-0 left-0 w-full z-[200] p-4 sm:p-6 animate-slide-up">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 sm:p-5 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center gap-4 max-w-3xl mx-auto relative overflow-hidden">
-                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
-                        <button onClick={handleDismiss} className="text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 rounded-full p-1.5 transition-colors">
-                            <X size={16} />
-                        </button>
-                    </div>
-                    
-                    <img src="https://i.ibb.co.com/Tx2C8J3Y/ENSIKLOPEDIA-39.png" alt="Logo RBA" className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 drop-shadow-md" />
-                    
-                    <div className="flex-1 text-center sm:text-left pr-4">
-                        <h3 className="font-black text-slate-900 dark:text-white text-base sm:text-lg mb-1">Pasang Aplikasi RBA</h3>
-                        {isIOS ? (
-                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">Ketuk tombol <Share2 size={14} className="inline mx-1 text-blue-500"/> (Bagikan) di bawah, lalu pilih <strong>"Tambahkan ke Layar Utama"</strong> untuk akses super cepat.</p>
-                        ) : (
-                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">Pasang aplikasi ini ke Layar Utama HP Anda. Akses lebih cepat, ringan, dan hemat kuota.</p>
+            <>
+            {/* Banner Tawaran Install */}
+            {showPrompt && !showManualGuide && (
+                <div className="fixed bottom-0 left-0 w-full z-[200] p-4 sm:p-6 animate-slide-up">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 sm:p-5 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center gap-4 max-w-3xl mx-auto relative overflow-hidden">
+                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+                            <button onClick={handleDismiss} className="text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 rounded-full p-1.5 transition-colors">
+                                <X size={16} />
+                            </button>
+                        </div>
+                        
+                        <img src="https://i.ibb.co.com/Tx2C8J3Y/ENSIKLOPEDIA-39.png" alt="Logo RBA" className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 drop-shadow-md" />
+                        
+                        <div className="flex-1 text-center sm:text-left pr-4">
+                            <h3 className="font-black text-slate-900 dark:text-white text-base sm:text-lg mb-1">Pasang Aplikasi RBA</h3>
+                            {isIOS ? (
+                                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">Ketuk tombol <Share2 size={14} className="inline mx-1 text-blue-500"/> (Bagikan) di bawah, lalu pilih <strong>"Tambahkan ke Layar Utama"</strong> untuk akses super cepat.</p>
+                            ) : (
+                                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">Pasang aplikasi ini ke Layar Utama HP Anda. Akses lebih cepat, ringan, dan hemat kuota.</p>
+                            )}
+                        </div>
+
+                        {!isIOS && (
+                            <div className="w-full sm:w-auto shrink-0 mt-3 sm:mt-0">
+                                <Button onClick={handleInstallClick} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 border-none whitespace-nowrap">
+                                    <Download size={18} className="mr-2"/> Pasang Sekarang
+                                </Button>
+                            </div>
                         )}
                     </div>
-
-                    {!isIOS && (
-                        <div className="w-full sm:w-auto shrink-0 mt-3 sm:mt-0">
-                            <Button onClick={handleInstallClick} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 border-none whitespace-nowrap">
-                                <Download size={18} className="mr-2"/> Pasang Sekarang
-                            </Button>
-                        </div>
-                    )}
                 </div>
-            </div>
+            )}
+
+            {/* Modal Panduan Manual (Pengganti Alert) */}
+            {showManualGuide && (
+               <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[250] flex items-center justify-center p-4 animate-fade-in">
+                  <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-700 animate-slide-up text-center">
+                     <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Smartphone size={32} />
+                     </div>
+                     <h2 className="text-xl font-black mb-2 text-slate-900 dark:text-white">Panduan Pemasangan</h2>
+                     <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+                        Browser Anda memblokir pemasangan otomatis. Mohon pasang secara manual:
+                        <br/><br/>
+                        1. Ketuk ikon Menu (titik tiga <b>⋮</b>) di pojok kanan atas browser.<br/>
+                        2. Pilih <b>"Tambahkan ke Layar Utama"</b> (Add to Home screen) atau <b>"Instal Aplikasi"</b>.
+                     </p>
+                     <Button onClick={() => { setShowManualGuide(false); setShowPrompt(false); }} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 border-none">Saya Mengerti</Button>
+                  </div>
+               </div>
+            )}
+            </>
         );
     };
 
