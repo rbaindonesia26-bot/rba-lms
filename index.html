@@ -1442,7 +1442,7 @@
     const JadwalAkademik = ({ schedules = [], role, db }) => {
         const [showModal, setShowModal] = useState(false);
         const [isSubmitting, setIsSubmitting] = useState(false);
-        const [form, setForm] = useState({ title: '', datetime: '', desc: '', link: '' });
+        const [form, setForm] = useState({ id: '', title: '', datetime: '', desc: '', link: '' });
 
         const sortedSchedules = [...schedules].sort((a,b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
         const now = new Date().getTime();
@@ -1453,11 +1453,16 @@
             e.preventDefault();
             setIsSubmitting(true);
             try {
-                const newSchedule = { id: 'sch_' + Date.now().toString(36), ...form };
-                const updated = [...schedules, newSchedule];
+                let updated;
+                if (form.id) {
+                    updated = schedules.map(s => s.id === form.id ? form : s);
+                } else {
+                    const newSchedule = { id: 'sch_' + Date.now().toString(36), ...form };
+                    updated = [...schedules, newSchedule];
+                }
                 await setDoc(doc(db, "rba_lms", "main_db"), { schedules: updated }, { merge: true });
                 setShowModal(false);
-                setForm({ title: '', datetime: '', desc: '', link: '' });
+                setForm({ id: '', title: '', datetime: '', desc: '', link: '' });
             } catch(e) { console.error("Gagal simpan jadwal:", e); }
             setIsSubmitting(false);
         };
@@ -1469,8 +1474,18 @@
             catch(e) { console.error("Gagal hapus:", e); }
         };
 
+        const handleEditClick = (sch) => {
+            setForm(sch);
+            setShowModal(true);
+        };
+
+        const handleAddClick = () => {
+            setForm({ id: '', title: '', datetime: '', desc: '', link: '' });
+            setShowModal(true);
+        };
+
         const ScheduleCard = ({ sch, isPast }) => (
-            <Card className={`p-5 flex flex-col justify-between border-l-4 ${isPast ? 'border-l-slate-400 opacity-60' : 'border-l-indigo-500 hover:shadow-md'} transition-all`}>
+            <Card className={`p-5 flex flex-col justify-between border-l-4 ${isPast ? 'border-l-slate-400 opacity-90 bg-slate-50 dark:bg-slate-900/50' : 'border-l-indigo-500 hover:shadow-md'} transition-all`}>
                 <div>
                     <div className="flex justify-between items-start mb-3">
                         <div className="flex gap-2">
@@ -1478,7 +1493,10 @@
                             <Badge variant={isPast ? 'slate' : 'blue'} className="!text-[10px]"><Clock size={12} className="mr-1"/> {new Date(sch.datetime).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</Badge>
                         </div>
                         {(role === 'admin' || role === 'guru') && (
-                            <button onClick={() => handleDelete(sch.id)} className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"><Trash2 size={14}/></button>
+                            <div className="flex gap-1 relative z-10">
+                                <button onClick={() => handleEditClick(sch)} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Edit Jadwal"><PenTool size={14}/></button>
+                                <button onClick={() => handleDelete(sch.id)} className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors" title="Hapus Jadwal"><Trash2 size={14}/></button>
+                            </div>
                         )}
                     </div>
                     <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">{sch.title}</h3>
@@ -1491,7 +1509,7 @@
         );
 
         return (
-            <div className="p-4 md:p-6 lg:p-8 w-full max-w-5xl mx-auto space-y-6 animate-slide-up pb-24">
+            <div className="p-4 md:p-6 lg:p-8 w-full max-w-5xl mx-auto space-y-6 pb-24">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
                     <div>
                         <Badge variant="indigo" className="mb-3 text-[10px] bg-indigo-100 text-indigo-600">SISTEM INFORMASI</Badge>
@@ -1499,7 +1517,7 @@
                         <p className="text-sm text-slate-500 mt-1">Jadwal tatap muka virtual dan kelas interaktif (Live Session).</p>
                     </div>
                     {(role === 'admin' || role === 'guru') && (
-                        <Button onClick={() => setShowModal(true)} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white border-none shadow-indigo-500/20"><PlusCircle size={18}/> Tambah Jadwal Baru</Button>
+                        <Button onClick={handleAddClick} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white border-none shadow-indigo-500/20"><PlusCircle size={18}/> Tambah Jadwal Baru</Button>
                     )}
                 </div>
 
@@ -1529,7 +1547,7 @@
                 {showModal && (
                    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700 animate-slide-up">
-                         <h2 className="text-xl font-bold mb-4">Buat Jadwal Baru</h2>
+                         <h2 className="text-xl font-bold mb-4">{form.id ? 'Edit Jadwal' : 'Buat Jadwal Baru'}</h2>
                          <form onSubmit={handleSave} className="space-y-4">
                             <div><label className="block text-sm font-bold mb-2">Judul Pertemuan</label><input type="text" required value={form.title} onChange={e=>setForm({...form, title: e.target.value})} placeholder="Contoh: Live Tanya Jawab Nahwu" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-indigo-600 text-sm" /></div>
                             <div><label className="block text-sm font-bold mb-2">Tanggal & Waktu</label><input type="datetime-local" required value={form.datetime} onChange={e=>setForm({...form, datetime: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-indigo-600 text-sm" /></div>
