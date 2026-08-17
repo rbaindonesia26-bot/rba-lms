@@ -888,9 +888,15 @@
                           <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Program Pilihan</label>
                           <select required value={regForm.program} onChange={(e) => setRegForm({...regForm, program: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm">
                               <option value="" disabled>-- Pilih Program --</option>
-                              {safeCoursesData.map((c) => (
-                                  <option key={c.id} value={c.title}>{c.title}</option>
-                              ))}
+                              {["Bahasa Arab", "Ulum Syar'i", "Program Bersanad"].map(kategori => {
+                                  const filtered = safeCoursesData.filter(c => c.kategori === kategori && c.status === 'Aktif');
+                                  if(filtered.length === 0) return null;
+                                  return (
+                                      <optgroup key={kategori} label={kategori}>
+                                          {filtered.map(c => <option key={c.id} value={c.title}>{c.title}</option>)}
+                                      </optgroup>
+                                  );
+                              })}
                           </select>
                         </div>
 
@@ -1713,6 +1719,7 @@
       const [showShareModal, setShowShareModal] = useState(null);
 
       const [newToken, setNewToken] = useState('');
+      const [roleFilter, setRoleFilter] = useState('Semua');
       const [newRole, setNewRole] = useState('siswa');
       const [newNama, setNewNama] = useState('');
       const [editRole, setEditRole] = useState('siswa');
@@ -1721,7 +1728,11 @@
       const [errorMsg, setErrorMsg] = useState('');
 
       const usersList = Object.entries(usersData).map(([token, data]) => ({ token, ...data }));
-      const filteredUsers = usersList.filter(u => u.token.toLowerCase().includes(searchTerm.toLowerCase()) || (u.name && u.name.toLowerCase().includes(searchTerm.toLowerCase())));
+      const filteredUsers = usersList.filter(u => {
+          const matchSearch = u.token.toLowerCase().includes(searchTerm.toLowerCase()) || (u.name && u.name.toLowerCase().includes(searchTerm.toLowerCase()));
+          const matchRole = roleFilter === 'Semua' ? true : u.role === roleFilter;
+          return matchSearch && matchRole;
+      });
 
       const generateRandomToken = () => {
          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let result = 'RBA';
@@ -1866,10 +1877,20 @@
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input type="text" placeholder="Cari token atau nama..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 focus:outline-none text-sm transition-shadow" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
                </div>
-               <div className="flex gap-3 w-full md:w-auto">
-                   <Button onClick={handleExportCSV} variant="outline" className="w-full md:w-auto gap-2 text-sm text-emerald-600 border-emerald-300 hover:bg-emerald-50"><FileSpreadsheet size={18}/> Ekspor CSV (Excel)</Button>
-                   <Button onClick={()=>setShowBulkModal(true)} className="w-full md:w-auto gap-2 text-sm bg-purple-600 hover:bg-purple-700 text-white border-none shadow-purple-500/20"><Users size={18}/> Buat Massal</Button>
-                   <Button onClick={()=>setShowAddModal(true)} className="w-full md:w-auto gap-2 text-sm border-none"><PlusCircle size={18}/> Buat Token</Button>
+               <div className="flex gap-3 w-full md:w-auto overflow-x-auto custom-scrollbar pb-1 md:pb-0">
+                   <div className="relative shrink-0 w-36">
+                       <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                       <select value={roleFilter} onChange={e=>setRoleFilter(e.target.value)} className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm font-bold text-slate-700 dark:text-slate-300 appearance-none">
+                           <option value="Semua">Semua Peran</option>
+                           <option value="siswa">Siswa</option>
+                           <option value="guru">Guru</option>
+                           <option value="admin">Admin</option>
+                       </select>
+                       <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
+                   </div>
+                   <Button onClick={handleExportCSV} variant="outline" className="shrink-0 gap-2 text-sm text-emerald-600 border-emerald-300 hover:bg-emerald-50"><FileSpreadsheet size={18}/> Ekspor CSV</Button>
+                   <Button onClick={()=>setShowBulkModal(true)} className="shrink-0 gap-2 text-sm bg-purple-600 hover:bg-purple-700 text-white border-none shadow-purple-500/20"><Users size={18}/> Massal</Button>
+                   <Button onClick={()=>setShowAddModal(true)} className="shrink-0 gap-2 text-sm border-none"><PlusCircle size={18}/> Token</Button>
                </div>
             </div>
 
@@ -2022,11 +2043,13 @@
 
     const ManajemenProgramAdmin = ({ courses, db, storage }) => {
       const [view, setView] = useState('list');
-      const [formData, setFormData] = useState({ id: '', title: '', desc: '', kategori: "Ulum Syar'i", status: 'Draft', coverUrl: '' });
+      const [formData, setFormData] = useState({ id: '', title: '', desc: '', kategori: "Bahasa Arab", status: 'Draft', coverUrl: '' });
+      const [kategoriFilter, setKategoriFilter] = useState('Semua');
       const [isSubmitting, setIsSubmitting] = useState(false);
       const [isUploading, setIsUploading] = useState(false);
       const [uploadMsg, setUploadMsg] = useState('');
       const [courseToDelete, setCourseToDelete] = useState(null);
+      const [draggedItemIdx, setDraggedItemIdx] = useState(null);
       
       const [activeCourse, setActiveCourse] = useState(null);
       const [modulForm, setModulForm] = useState({ id: '', title: '', desc: '', type: 'youtube', url: '', questions: [] });
@@ -2050,7 +2073,7 @@
          }
       };
 
-      const handleAdd = () => { setFormData({ id: 'crs_' + Date.now().toString(36), title: '', desc: '', kategori: "Ulum Syar'i", status: 'Draft', coverUrl: '', modules: [] }); setUploadMsg(''); setView('form'); };
+      const handleAdd = () => { setFormData({ id: 'crs_' + Date.now().toString(36), title: '', desc: '', kategori: "Bahasa Arab", status: 'Draft', coverUrl: '', modules: [] }); setUploadMsg(''); setView('form'); };
       const handleEdit = (course) => { setFormData(course); setUploadMsg(''); setView('form'); };
       const openModules = (course) => { setActiveCourse(course); setView('modules'); };
 
@@ -2062,6 +2085,27 @@
               await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
               setCourseToDelete(null);
           } catch(error) { console.error(error); }
+          setIsSubmitting(false);
+      };
+
+      const handleDropCourse = async (targetIdx) => {
+          if(draggedItemIdx === null || draggedItemIdx === targetIdx) return;
+          setIsSubmitting(true);
+          try {
+              const displayedCourses = courses.filter(c => kategoriFilter === 'Semua' ? true : c.kategori === kategoriFilter);
+              const draggedCourse = displayedCourses[draggedItemIdx];
+              const targetCourse = displayedCourses[targetIdx];
+              
+              let updatedCourses = [...courses];
+              const realDraggedIdx = updatedCourses.findIndex(c => c.id === draggedCourse.id);
+              const realTargetIdx = updatedCourses.findIndex(c => c.id === targetCourse.id);
+              
+              const [movedItem] = updatedCourses.splice(realDraggedIdx, 1);
+              updatedCourses.splice(realTargetIdx, 0, movedItem);
+              
+              await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
+          } catch(e) { console.error("Gagal menggeser posisi:", e); }
+          setDraggedItemIdx(null);
           setIsSubmitting(false);
       };
 
@@ -2238,8 +2282,8 @@
                      <div>
                         <label className="block text-sm font-bold mb-2">Kategori</label>
                         <select value={formData.kategori} onChange={e => setFormData({...formData, kategori: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm">
-                           <option value="Ulum Syar'i">Ulum Syar'i</option>
                            <option value="Bahasa Arab">Bahasa Arab</option>
+                           <option value="Ulum Syar'i">Ulum Syar'i</option>
                            <option value="Program Bersanad">Program Bersanad</option>
                         </select>
                      </div>
@@ -2441,22 +2485,46 @@
          );
       }
 
+      const displayedCourses = courses.filter(c => kategoriFilter === 'Semua' ? true : c.kategori === kategoriFilter);
+
       return (
          <div className="p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6 animate-slide-up pb-24">
-            <div className="flex justify-between items-end mb-6"><div><h1 className="text-3xl font-black">Manajemen Program</h1></div><Button onClick={handleAdd} className="gap-2 border-none"><PlusCircle size={18}/> Tambah</Button></div>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-6 gap-4">
+               <div><h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Manajemen Program</h1></div>
+               <div className="flex gap-3 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:w-48">
+                      <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                      <select value={kategoriFilter} onChange={e=>setKategoriFilter(e.target.value)} className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-600 text-sm font-bold text-slate-700 dark:text-slate-300 appearance-none">
+                          <option value="Semua">Semua Kategori</option>
+                          <option value="Bahasa Arab">Bahasa Arab</option>
+                          <option value="Ulum Syar'i">Ulum Syar'i</option>
+                          <option value="Program Bersanad">Program Bersanad</option>
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
+                  </div>
+                  <Button onClick={handleAdd} className="gap-2 border-none shrink-0"><PlusCircle size={18}/> Tambah</Button>
+               </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-               {courses.map((prog, i) => (
-                  <Card key={i} className="p-0 flex flex-col justify-between overflow-hidden border-2 border-slate-200">
-                     {prog.coverUrl ? <div className="h-32 relative"><img src={prog.coverUrl} className="absolute inset-0 w-full h-full object-cover" /></div> : <div className="h-32 bg-slate-100 flex items-center justify-center"><BookOpen size={28}/></div>}
-                     <div className="p-4 flex-1 flex flex-col">
-                        <div className="flex justify-between items-start mb-2"><Badge variant="emerald" className="!text-[10px] uppercase">{prog.status}</Badge></div>
-                        <h3 className="font-bold text-base mb-2 line-clamp-2">{prog.title}</h3>
-                        <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-100">
+               {displayedCourses.length === 0 ? (
+                   <div className="col-span-full py-12 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">Tidak ada program di kategori ini.</div>
+               ) : displayedCourses.map((prog, i) => (
+                  <Card key={i} 
+                     draggable 
+                     onDragStart={() => setDraggedItemIdx(i)} 
+                     onDragOver={(e) => e.preventDefault()} 
+                     onDrop={() => handleDropCourse(i)}
+                     className={`p-0 flex flex-col justify-between overflow-hidden border-2 transition-all cursor-grab active:cursor-grabbing hover:shadow-lg ${draggedItemIdx === i ? 'opacity-50 border-blue-500 border-dashed scale-95' : 'border-slate-200 dark:border-slate-800'}`}>
+                     {prog.coverUrl ? <div className="h-32 relative pointer-events-none"><img src={prog.coverUrl} className="absolute inset-0 w-full h-full object-cover" /></div> : <div className="h-32 bg-slate-100 dark:bg-slate-800 flex items-center justify-center pointer-events-none"><BookOpen size={28} className="text-slate-300"/></div>}
+                     <div className="p-4 flex-1 flex flex-col pointer-events-none">
+                        <div className="flex justify-between items-start mb-2"><Badge variant="emerald" className="!text-[10px] uppercase">{prog.status}</Badge><GripVertical size={16} className="text-slate-400"/></div>
+                        <h3 className="font-bold text-base mb-2 line-clamp-2 text-slate-900 dark:text-white">{prog.title}</h3>
+                        <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 pointer-events-auto">
                            <span className="text-xs font-bold text-slate-500">{(prog.modules || []).length} Materi</span>
                            <div className="flex gap-1">
-                              <button onClick={() => openModules(prog)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Kelola Materi"><Layers size={16}/></button>
-                              <button onClick={() => handleEdit(prog)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit Program"><PenTool size={16}/></button>
-                              <button onClick={() => setCourseToDelete(prog.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg" title="Hapus Program"><Trash2 size={16}/></button>
+                              <button onClick={() => openModules(prog)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg" title="Kelola Materi"><Layers size={16}/></button>
+                              <button onClick={() => handleEdit(prog)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg" title="Edit Program"><PenTool size={16}/></button>
+                              <button onClick={() => setCourseToDelete(prog.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg" title="Hapus Program"><Trash2 size={16}/></button>
                            </div>
                         </div>
                      </div>
