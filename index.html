@@ -1239,14 +1239,39 @@
 
     const KatalogProgramSiswa = ({ setActiveMenu, onViewDetail, onEditAction, courses = [] }) => {
       const role = React.useContext(ThemeContext);
+      const [kategoriFilter, setKategoriFilter] = useState('Semua');
+
+      const displayedCourses = courses.filter(c => kategoriFilter === 'Semua' ? true : c.kategori === kategoriFilter);
+
       return (
       <div className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto space-y-6 md:space-y-8 animate-slide-up pb-24 overflow-x-hidden">
         <div className="text-center mb-6 md:mb-10 px-2 sm:px-4">
           <Badge variant={role === 'admin' ? 'blue' : 'orange'} className="mx-auto mb-3 sm:mb-4 text-[10px] sm:text-xs">{role === 'admin' ? 'MANAJEMEN KATALOG' : 'EKSPLORASI KURIKULUM'}</Badge>
           <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-2 sm:mb-4 leading-tight">Program Pembelajaran</h1>
         </div>
+        
+        {}
+        <div className="flex justify-center mb-6 md:mb-8">
+            <div className="relative w-full max-w-xs">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <select value={kategoriFilter} onChange={e=>setKategoriFilter(e.target.value)} className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-600 text-sm font-bold text-slate-700 dark:text-slate-300 appearance-none">
+                    <option value="Semua">Semua Kategori</option>
+                    <option value="Bahasa Arab">Bahasa Arab</option>
+                    <option value="Ulum Syar'i">Ulum Syar'i</option>
+                    <option value="Program Bersanad">Program Bersanad</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
+            </div>
+        </div>
+
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {courses.map((prog, i) => {
+          {displayedCourses.length === 0 ? (
+              <div className="col-span-full py-16 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                  <BookOpen size={48} className="mx-auto mb-4 text-slate-300" />
+                  <p className="font-medium">Belum ada program di kategori ini.</p>
+              </div>
+          ) : displayedCourses.map((prog, i) => {
              const isAktif = prog.status === 'Aktif';
              const ProgIcon = prog.kategori === 'Program Bersanad' ? Crown : (prog.kategori === "Ulum Syar'i" ? BookText : BookOpen);
              return (
@@ -3174,6 +3199,15 @@
     }
 
     const PerpustakaanDigital = ({ libraryData = [] }) => {
+        const [searchTerm, setSearchTerm] = useState('');
+        const [typeFilter, setTypeFilter] = useState('Semua');
+
+        const filteredLibrary = libraryData.filter(item => {
+            const matchSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || (item.desc && item.desc.toLowerCase().includes(searchTerm.toLowerCase()));
+            const matchType = typeFilter === 'Semua' ? true : item.type === typeFilter;
+            return matchSearch && matchType;
+        });
+
         return (
             <div className="p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto space-y-6 md:space-y-8 animate-slide-up pb-24 overflow-x-hidden">
                 <div className="text-center mb-6 md:mb-10 px-2 sm:px-4">
@@ -3181,15 +3215,40 @@
                     <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-2 sm:mb-4 leading-tight">Perpustakaan RBA</h1>
                     <p className="text-slate-500 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">Nikmati akses tak terbatas ke ragam koleksi kitab, literatur ilmu syar'i, hingga berbagai <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-[#06B6D4] to-emerald-500">aplikasi edukatif</span> yang dirancang khusus untuk memperkaya pengalaman belajar Anda.</p>
                 </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 max-w-3xl mx-auto mb-6 sm:mb-8">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input type="text" placeholder="Cari judul buku atau materi..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none text-sm transition-shadow shadow-sm" />
+                    </div>
+                    <div className="relative shrink-0 sm:w-48">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="w-full pl-9 pr-8 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-600 text-sm font-bold text-slate-700 dark:text-slate-300 appearance-none shadow-sm">
+                            <option value="Semua">Semua Format</option>
+                            <option value="Kitab PDF">Kitab PDF</option>
+                            <option value="Artikel Web">Artikel Web</option>
+                            <option value="Video Kajian">Video Kajian</option>
+                            <option value="Audio MP3">Audio MP3</option>
+                        </select>
+                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
+                    </div>
+                </div>
+
                 {libraryData.length === 0 ? (
                     <div className="text-center py-16 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl text-slate-500 shadow-sm">
                         <BookMarked size={48} className="mx-auto mb-4 text-slate-300" />
                         <h3 className="font-bold text-lg mb-2 text-slate-700 dark:text-slate-300">Koleksi Sedang Disiapkan</h3>
                         <p className="text-sm">Buku dan literatur digital sedang dalam proses kurasi oleh tim pengajar.</p>
                     </div>
+                ) : filteredLibrary.length === 0 ? (
+                    <div className="text-center py-16 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl text-slate-500 shadow-sm">
+                        <Search size={40} className="mx-auto mb-3 text-slate-300" />
+                        <h3 className="font-bold text-lg mb-2 text-slate-700 dark:text-slate-300">Hasil Tidak Ditemukan</h3>
+                        <p className="text-sm">Coba gunakan kata kunci lain atau ubah filter format file.</p>
+                    </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                        {libraryData.map((item, i) => (
+                        {filteredLibrary.map((item, i) => (
                             <Card key={i} className="p-0 flex flex-col justify-between border-2 border-slate-200 dark:border-slate-800 transition-all overflow-hidden hover:shadow-xl hover:-translate-y-1">
                                 <div className="h-40 sm:h-48 relative bg-slate-100 dark:bg-slate-800">
                                     {item.coverUrl ? (
