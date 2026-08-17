@@ -948,6 +948,7 @@
 
     const ValidasiPendaftaranAdmin = ({ registrations, db, usersData, courses }) => {
         const [isProcessing, setIsProcessing] = useState(false);
+        const [regToReject, setRegToReject] = useState(null);
         const pendingList = Object.entries(registrations || {}).map(([id, data]) => ({ id, ...data })).sort((a,b) => b.timestamp - a.timestamp);
 
         const generateToken = () => {
@@ -956,13 +957,18 @@
              return result;
         };
 
-        const handleReject = async (regId) => {
-            if(!window.confirm('Tolak pendaftaran ini? Data pendaftar akan dihapus dari daftar.')) return;
+        const handleReject = (regId) => {
+            setRegToReject(regId);
+        };
+
+        const executeReject = async () => {
+            if(!regToReject) return;
             setIsProcessing(true);
             try {
                 await updateDoc(doc(db, "rba_lms", "main_db"), {
-                    [`registrations.${regId}`]: deleteField()
+                    [`registrations.${regToReject}`]: deleteField()
                 });
+                setRegToReject(null);
             } catch (error) { console.error("Gagal menolak", error); }
             setIsProcessing(false);
         };
@@ -1051,6 +1057,22 @@
                             </Card>
                         ))}
                     </div>
+                )}
+                
+                {regToReject && (
+                   <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-700 animate-slide-up text-center">
+                         <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <XCircle size={32} />
+                         </div>
+                         <h2 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">Tolak Pendaftaran?</h2>
+                         <p className="text-sm text-slate-500 mb-6 leading-relaxed">Data pendaftar ini akan dihapus dari daftar dan tidak dapat dikembalikan. Lanjutkan?</p>
+                         <div className="flex gap-3">
+                            <Button type="button" variant="ghost" onClick={() => setRegToReject(null)} className="flex-1">Batal</Button>
+                            <Button type="button" onClick={executeReject} disabled={isProcessing} className="flex-1 bg-rose-600 hover:bg-rose-700 shadow-rose-500/30 border-none text-white">Ya, Tolak</Button>
+                         </div>
+                      </div>
+                   </div>
                 )}
             </div>
         );
@@ -1941,6 +1963,7 @@
       const [isSubmitting, setIsSubmitting] = useState(false);
       const [isUploading, setIsUploading] = useState(false);
       const [uploadMsg, setUploadMsg] = useState('');
+      const [courseToDelete, setCourseToDelete] = useState(null);
       
       const [activeCourse, setActiveCourse] = useState(null);
       const [modulForm, setModulForm] = useState({ id: '', title: '', desc: '', type: 'youtube', url: '', questions: [] });
@@ -1949,6 +1972,7 @@
       
       const [showApiModal, setShowApiModal] = useState(false);
       const [apiKeyInput, setApiKeyInput] = useState('');
+      const [modulToDelete, setModulToDelete] = useState(null);
 
       const getModulMeta = (type) => {
          switch(type) {
@@ -1966,6 +1990,17 @@
       const handleAdd = () => { setFormData({ id: 'crs_' + Date.now().toString(36), title: '', desc: '', kategori: "Ulum Syar'i", status: 'Draft', coverUrl: '', modules: [] }); setUploadMsg(''); setView('form'); };
       const handleEdit = (course) => { setFormData(course); setUploadMsg(''); setView('form'); };
       const openModules = (course) => { setActiveCourse(course); setView('modules'); };
+
+      const handleDeleteCourse = async () => {
+          if (!courseToDelete) return;
+          setIsSubmitting(true);
+          try {
+              const updatedCourses = courses.filter(c => c.id !== courseToDelete);
+              await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
+              setCourseToDelete(null);
+          } catch(error) { console.error(error); }
+          setIsSubmitting(false);
+      };
 
       const handleImageUpload = async (e) => {
          const file = e.target.files[0];
@@ -2110,6 +2145,22 @@
          setIsSubmitting(false);
       };
 
+      const handleDeleteModul = async () => {
+         if (!modulToDelete) return;
+         setIsSubmitting(true);
+         try {
+             let updatedCourses = [...courses];
+             const courseIdx = updatedCourses.findIndex(c => c.id === activeCourse.id);
+             if (courseIdx >= 0) {
+                 updatedCourses[courseIdx].modules = (updatedCourses[courseIdx].modules || []).filter(m => m.id !== modulToDelete);
+                 await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
+                 setActiveCourse(updatedCourses[courseIdx]);
+                 setModulToDelete(null);
+             }
+         } catch(error) {}
+         setIsSubmitting(false);
+      };
+
       if (view === 'form') {
          return (
             <div className="p-4 md:p-6 w-full max-w-3xl mx-auto space-y-6 animate-slide-up pb-24">
@@ -2176,7 +2227,10 @@
                                  <Badge variant="slate" className="!text-[9px] sm:!text-[10px] mt-1"><Icon size={12} className={`mr-1 ${Meta.color}`}/> {Meta.label}</Badge>
                              </div>
                           </div>
-                          <button onClick={() => { setModulForm(m); setIsModulFormOpen(true); }} className="p-2 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded-lg"><PenTool size={16}/></button>
+                          <div className="flex gap-2">
+                              <button onClick={() => { setModulForm(m); setIsModulFormOpen(true); }} className="p-2 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded-lg"><PenTool size={16}/></button>
+                              <button onClick={() => setModulToDelete(m.id)} className="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-lg"><Trash2 size={16}/></button>
+                          </div>
                       </Card>
                   )})}
                </div>
@@ -2304,6 +2358,22 @@
                   </div>
                )}
 
+               {modulToDelete && (
+                  <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+                     <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-700 animate-slide-up text-center">
+                        <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                           <Trash2 size={32} />
+                        </div>
+                        <h2 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">Hapus Tahapan?</h2>
+                        <p className="text-sm text-slate-500 mb-6 leading-relaxed">Materi yang dihapus tidak dapat dikembalikan. Lanjutkan?</p>
+                        <div className="flex gap-3">
+                           <Button type="button" variant="ghost" onClick={() => setModulToDelete(null)} className="flex-1">Batal</Button>
+                           <Button type="button" onClick={handleDeleteModul} disabled={isSubmitting} className="flex-1 bg-rose-600 hover:bg-rose-700 shadow-rose-500/30 border-none text-white">Ya, Hapus</Button>
+                        </div>
+                     </div>
+                  </div>
+               )}
+
             </div>
          );
       }
@@ -2321,14 +2391,31 @@
                         <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-100">
                            <span className="text-xs font-bold text-slate-500">{(prog.modules || []).length} Materi</span>
                            <div className="flex gap-1">
-                              <button onClick={() => openModules(prog)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"><Layers size={16}/></button>
-                              <button onClick={() => handleEdit(prog)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><PenTool size={16}/></button>
+                              <button onClick={() => openModules(prog)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Kelola Materi"><Layers size={16}/></button>
+                              <button onClick={() => handleEdit(prog)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit Program"><PenTool size={16}/></button>
+                              <button onClick={() => setCourseToDelete(prog.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg" title="Hapus Program"><Trash2 size={16}/></button>
                            </div>
                         </div>
                      </div>
                   </Card>
                ))}
             </div>
+            
+            {courseToDelete && (
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-700 animate-slide-up text-center">
+                        <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Trash2 size={32} />
+                        </div>
+                        <h2 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">Hapus Program Ini?</h2>
+                        <p className="text-sm text-slate-500 mb-6 leading-relaxed">Seluruh tahapan materi, kuis, tugas, dan data progres santri di dalam program ini akan ikut terhapus secara permanen. Lanjutkan?</p>
+                        <div className="flex gap-3">
+                            <Button type="button" variant="ghost" onClick={() => setCourseToDelete(null)} className="flex-1">Batal</Button>
+                            <Button type="button" onClick={handleDeleteCourse} disabled={isSubmitting} className="flex-1 bg-rose-600 hover:bg-rose-700 shadow-rose-500/30 border-none text-white">Ya, Hapus</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
          </div>
       );
     };
