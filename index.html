@@ -325,14 +325,12 @@
                  if (!uid) { uid = 'local_' + safeToken + '_' + Date.now().toString(36); }
              }
 
-             if (userData.uid !== uid) {
-                 try {
-                     const newUsers = { ...usersData };
-                     newUsers[safeToken] = { ...userData, uid: uid, used: true, name: finalName };
-                     await setDoc(doc(db, "rba_lms", "main_db"), { users: newUsers }, { merge: true });
-                 } catch (dbError) {
-                     console.warn("Peringatan Update Token", dbError);
-                 }
+             try {
+                 const newUsers = { ...usersData };
+                 newUsers[safeToken] = { ...userData, uid: uid, used: true, name: finalName, lastActive: Date.now() };
+                 await setDoc(doc(db, "rba_lms", "main_db"), { users: newUsers }, { merge: true });
+             } catch (dbError) {
+                 console.warn("Peringatan Update Token", dbError);
              }
 
              onLogin(userData.role, finalName, safeToken, uid);
@@ -1882,6 +1880,12 @@
                          <div className="min-w-0 flex-1 pr-3">
                              <div className="flex items-center gap-2 mb-1"><Key size={14} className="text-slate-400" /><h3 className="font-bold text-lg font-mono text-slate-900 dark:text-white truncate">{user.token}</h3></div>
                              <p className="text-sm font-bold text-slate-500 truncate">{user.name || 'Belum Diatur'}</p>
+                             <div className="flex items-center gap-1.5 mt-1.5">
+                                 <div className={`w-2 h-2 rounded-full ${user.lastActive && (Date.now() - user.lastActive < 86400000) ? 'bg-emerald-500 animate-pulse shadow-[0_0_5px_rgba(16,185,129,0.6)]' : 'bg-slate-300 dark:bg-slate-600'}`}></div>
+                                 <p className="text-[10px] text-slate-400 font-medium">
+                                     {user.lastActive ? `Login: ${new Date(user.lastActive).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}` : 'Belum pernah login'}
+                                 </p>
+                             </div>
                          </div>
                          <Badge variant={user.used ? 'emerald' : 'slate'} className="!text-[10px] shrink-0">{user.used ? 'TERPAKAI' : 'KOSONG'}</Badge>
                      </div>
