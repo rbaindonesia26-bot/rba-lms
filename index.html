@@ -1329,8 +1329,8 @@
           </div>
         );
     };
-
-    const ProfilDanRapor = ({ uid, currentUserToken, usersData, enrollmentsData, courses, onShowSertifikat }) => {
+    const ProfilDanRapor = ({ uid, currentUserToken, usersData, enrollmentsData, courses, onShowSertifikat, db }) => {
+        const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
         const userList = Object.entries(usersData).map(([token, data]) => ({ token, ...data }));
         const myUser = userList.find(u => u.token === currentUserToken) || { name: 'Siswa RBA', token: 'UNKNOWN', role: 'siswa', createdAt: Date.now() };
         
@@ -1350,6 +1350,56 @@
             courseStats.push({ ...c, progress: realProgress, completedMods: completedModules.length, totalMods: totalModules });
         });
 
+        const handlePhotoUpload = async (e) => {
+            const file = e.target.files[0];
+            if (!file || !db) return;
+            
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Ukuran foto terlalu besar. Maksimal 2MB.");
+                e.target.value = null;
+                return;
+            }
+
+            setIsUploadingPhoto(true);
+            try {
+                // Kompresi foto sebelum disimpan agar database tidak berat
+                const compressedUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width; 
+                            let height = img.height;
+                            const maxDim = 300; // Ukuran optimal untuk foto profil
+                            
+                            if (width > height && width > maxDim) { 
+                                height *= maxDim / width; width = maxDim; 
+                            } else if (height > maxDim) { 
+                                width *= maxDim / height; height = maxDim; 
+                            }
+                            
+                            canvas.width = width; 
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            resolve(canvas.toDataURL('image/jpeg', 0.6)); // Kualitas 60%
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                await updateDoc(doc(db, "rba_lms", "main_db"), {
+                    [`users.${currentUserToken}.photoUrl`]: compressedUrl
+                });
+            } catch (err) {
+                console.error("Gagal upload foto:", err);
+            }
+            setIsUploadingPhoto(false);
+        };
+
         return (
             <div className="p-4 md:p-6 lg:p-8 w-full max-w-5xl mx-auto space-y-6 lg:space-y-8 animate-slide-up pb-24 overflow-x-hidden">
                 <div className="mb-2 flex flex-col sm:flex-row justify-between sm:items-end">
@@ -1364,8 +1414,17 @@
                     <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 translate-x-10 -translate-y-10"></div>
                     <div className="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 p-1 shrink-0 shadow-lg shadow-orange-500/20 relative">
-                            <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center text-4xl font-black text-orange-500">
-                                {myUser.name.charAt(0).toUpperCase()}
+                            <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center text-4xl font-black text-orange-500 overflow-hidden relative group">
+                                {myUser.photoUrl ? (
+                                    <img src={myUser.photoUrl} alt="Profil" className="w-full h-full object-cover" />
+                                ) : (
+                                    myUser.name.charAt(0).toUpperCase()
+                                )}
+                                
+                                <label className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
+                                    {isUploadingPhoto ? <Loader2 className="animate-spin w-6 h-6" /> : <Camera className="w-6 h-6" />}
+                                    <input type="file" accept="image/jpeg, image/png, image/webp" className="hidden" onChange={handlePhotoUpload} disabled={isUploadingPhoto} />
+                                </label>
                             </div>
                             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-md border border-slate-700 whitespace-nowrap">
                                 <Zap size={10} className="text-amber-400"/> {currentXP} XP
@@ -3461,7 +3520,7 @@
           case 'kelas-saya': return <DashboardSiswa setActiveMenu={setActiveMenu} myCourses={myCoursesView} userName={userName} pengumuman={pengumuman} enrollmentsData={safeEnrollments} uid={currentUserUid} onGoToClass={(c) => { setSelectedClassroom(c); setActiveMenu('ruang-kelas'); }} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} schedules={schedules} />;
           case 'papan-peringkat': return <PapanPeringkat usersData={usersData} enrollments={safeEnrollments} courses={safeCourses} currentUserUid={currentUserUid} />;
           case 'sertifikat': return <SertifikatViewer course={selectedClassroom} userName={userName} onBack={() => setActiveMenu('profil')} />;
-          case 'profil': return <ProfilDanRapor uid={currentUserUid} currentUserToken={currentUserToken} usersData={usersData} enrollmentsData={safeEnrollments} courses={safeCourses} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} />;
+          case 'profil': return <ProfilDanRapor uid={currentUserUid} currentUserToken={currentUserToken} usersData={usersData} enrollmentsData={safeEnrollments} courses={safeCourses} onShowSertifikat={(c) => { setSelectedClassroom(c); setActiveMenu('sertifikat'); }} db={db} />;
           case 'jadwal-akademik': return <JadwalAkademik schedules={schedules} role={role} db={db} />;
           case 'manajemen-pengguna': return <ManajemenPenggunaAdmin usersData={usersData} enrollments={safeEnrollments} courses={safeCourses} />;
           case 'manajemen-program': return <ManajemenProgramAdmin courses={safeCourses} db={db} storage={storage} />;
@@ -3602,7 +3661,13 @@
                 <button onClick={() => setDarkMode(!darkMode)} className="p-2 text-slate-500 hover:text-blue-600 bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors mr-1">
                   {darkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">{userName.charAt(0)}</div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center font-bold text-sm shadow-inner overflow-hidden">
+                   {usersData[currentUserToken]?.photoUrl ? (
+                       <img src={usersData[currentUserToken].photoUrl} alt="Profil" className="w-full h-full object-cover" />
+                   ) : (
+                       userName.charAt(0)
+                   )}
+                </div>
               </div>
             </header>
             <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-slate-50 dark:bg-[#0B1120]">{renderContent()}</div>
