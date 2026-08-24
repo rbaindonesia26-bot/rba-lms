@@ -3700,13 +3700,25 @@
         }
       };
 
-      if (isAppInitializing) return (
-         <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] flex flex-col items-center justify-center p-4 text-center">
-            <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
-            <h2 className="text-xl font-black text-slate-800 dark:text-slate-200">Menghubungkan Server...</h2>
-         </div>
-      );
-
+if (isAppInitializing) return (
+  <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-50 dark:bg-[#001128]">
+    {/* Teks Berdenyut */}
+    <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900 dark:text-blue-400 animate-pulse tracking-wide mb-6">
+      Rumah Bahasa Arab
+    </h1>
+    
+    {/* Animasi Spinner */}
+    <div className="relative w-16 h-16">
+      <div className="absolute inset-0 border-4 border-slate-200 dark:border-slate-700 rounded-full"></div>
+      <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+    </div>
+    
+    {/* Teks Tambahan */}
+    <p className="mt-6 text-slate-500 dark:text-slate-400 font-medium text-sm animate-pulse">
+      Menyiapkan ruang kelas...
+    </p>
+  </div>
+);
       if (!isLoggedIn) return (
         <ThemeContext.Provider value="admin">
            <InstallPrompt />
