@@ -757,6 +757,54 @@
                      ) : (
                         <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                          {/* KARTU E-BOOK PREMIUM */}
+<div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+  
+  {/* Area Gambar Cover */}
+  <div className="relative h-48 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+    {/* GANTI URL DI BAWAH dengan link gambar cover E-Book asli Anda */}
+    <img 
+      src="https://images.unsplash.com/photo-1544716278-e513176f20b5?auto=format&fit=crop&q=80&w=600" 
+      alt="Cover E-Book RBA" 
+      className="w-full h-full object-cover" 
+    />
+    {/* Label Emas Penanda Premium */}
+    <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-md">
+      PREMIUM
+    </div>
+  </div>
+
+  {/* Area Informasi & Tombol */}
+  <div className="p-5 flex-1 flex flex-col">
+    {/* Judul & Deskripsi Singkat */}
+    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-2 leading-tight">
+      Panduan Lengkap Nahwu Shorof (E-Book)
+    </h3>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5 line-clamp-2">
+      Kuasai pondasi bahasa Arab dengan metode terstruktur. Cocok untuk pemula hingga tingkat lanjut.
+    </p>
+
+    {/* Harga & Tombol Aksi */}
+    <div className="mt-auto">
+      <div className="text-blue-600 dark:text-blue-400 font-extrabold text-xl mb-3">
+        Rp 49.000
+      </div>
+      
+      {/* TOMBOL WHATSAPP */}
+      {/* PERHATIAN: Ganti angka 6281234567890 dengan nomor WA Anda */}
+      <button 
+        onClick={() => window.open('https://wa.me/6281234567890?text=Halo%20Admin%20RBA,%20saya%20berminat%20membeli%20E-Book%20Panduan%20Lengkap%20Nahwu%20Shorof.%20Bagaimana%20cara%20pembayarannya?', '_blank')}
+        className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+      >
+        {/* Ikon Logo WhatsApp */}
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12.031 21.066h-.011c-1.832 0-3.626-.492-5.197-1.424l-5.787 1.517 1.543-5.64a10.932 10.932 0 01-1.503-5.617C1.077 4.908 5.986 0 12.031 0 18.077 0 23 4.907 23 10.953c0 6.045-4.922 10.953-10.969 11.113zm-5.688-3.037c1.65 1.05 3.593 1.621 5.677 1.621 5.253 0 9.531-4.277 9.531-9.531s-4.277-9.531-9.531-9.531C6.766 1.59 2.488 5.867 2.488 11.121c0 1.956.551 3.864 1.594 5.485l-1.018 3.722 3.835-1.006zM17.514 14.88c-.274-.137-1.623-.801-1.874-.892-.25-.093-.433-.137-.617.137-.184.274-.71.892-.871 1.075-.16.183-.32.205-.594.068-.274-.137-1.158-.426-2.205-1.359-.815-.726-1.365-1.623-1.526-1.897-.161-.274-.017-.423.12-.56.123-.122.274-.32.411-.481.137-.16.183-.274.274-.457.091-.183.045-.343-.023-.48-.068-.137-.617-1.487-.845-2.036-.223-.537-.449-.464-.617-.473-.16-.008-.342-.008-.525-.008-.183 0-.48.068-.731.343-.251.274-.959.938-.959 2.288 0 1.35 .982 2.654 1.119 2.837.137.183 1.935 2.955 4.686 4.143.655.283 1.165.452 1.564.578.658.209 1.257.18 1.734.108.533-.08 1.623-.663 1.85-1.305.228-.641.228-1.19.16-1.304-.068-.115-.251-.184-.525-.32z"/>
+        </svg>
+        Beli via WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
                            {displayLibrary.map((item, i) => (
                               <Card key={i} className="p-0 flex flex-col justify-between border border-slate-200 dark:border-slate-800 transition-all overflow-hidden hover:shadow-xl hover:-translate-y-1 bg-white dark:bg-slate-900">
                                  <div className="h-40 relative bg-slate-100 dark:bg-slate-800">
