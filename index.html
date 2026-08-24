@@ -3635,24 +3635,24 @@
               if(docSnap.exists()) {
                   const data = docSnap.data();
                   
-                  // LOGIKA INJEKSI DEMO KE DATABASE JIKA KOSONG
-                  if(data.courses && data.courses.length > 0) {
-                      setCourses(data.courses);
-                  } else if (!data.courses || data.courses.length === 0) {
-                      try { setDoc(doc(db, "rba_lms", "main_db"), { courses: defaultDemoCourses }, { merge: true }); } catch(e) {}
-                  }
-                  
-                  if(data.enrollments) setEnrollments(data.enrollments);
-                  if(data.users && Object.keys(data.users).length > 0) setUsersData(data.users);
-                  if(data.pengumuman !== undefined) setPengumuman(data.pengumuman);
-                  if(data.schedules) setSchedules(data.schedules); else setSchedules([]); 
-                  if(data.registrations) setRegistrations(data.registrations); else setRegistrations({});
-                  if(data.library) setLibraryData(data.library); else setLibraryData([]);
-              } else {
-                  // Inisiasi database awal jika sama sekali belum pernah dibuat
-                  try { setDoc(doc(db, "rba_lms", "main_db"), { courses: defaultDemoCourses, users: defaultUsers }, { merge: true }); } catch(e) {}
-              }
-              setFirebaseStatus('online'); clearTimeout(timeoutId); setIsAppInitializing(false);
+// LOGIKA PENGAMBILAN DATA KURSUS (INJEKSI DEMO SUDAH DIMATIKAN)
+            if(data.courses) {
+                setCourses(data.courses);
+            } else {
+                setCourses([]); // Biarkan kosong jika memang tidak ada data, jangan diisi demo
+            }
+
+            if(data.enrollments) setEnrollments(data.enrollments);
+            if(data.users && Object.keys(data.users).length > 0) setUsersData(data.users);
+            if(data.pengumuman !== undefined) setPengumuman(data.pengumuman);
+            if(data.schedules) setSchedules(data.schedules); else setSchedules([]);
+            if(data.registrations) setRegistrations(data.registrations); else setRegistrations({});
+            if(data.library) setLibraryData(data.library); else setLibraryData([]);
+        } else {
+            // Inisiasi database awal jika sama sekali belum pernah dibuat (Tanpa Demo Kursus)
+            try { setDoc(doc(db, "rba_lms", "main_db"), { courses: [], users: defaultUsers }, { merge: true }); } catch(e) {}
+        }
+            setFirebaseStatus('online'); clearTimeout(timeoutId); setIsAppInitializing(false);
           }, (error) => { setFirebaseStatus('error'); clearTimeout(timeoutId); setIsAppInitializing(false); });
           return () => unsub();
       }, []);
