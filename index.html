@@ -3418,9 +3418,8 @@ const handleUpload = async (e, field) => {
     if (!rawFile) return;
 
     // TRIK RAHASIA: Karena kita simpan di database teks, kita hanya izinkan gambar. 
-    // Dokumen PDF ukurannya terlalu besar untuk trik ini.
     if (!rawFile.type.startsWith('image/')) {
-        alert("PENTING: Untuk dokumen (PDF) atau Video, silakan gunakan kolom 'Paste URL'. Tombol Upload ini sekarang dikhususkan untuk Gambar Sampul saja agar sistem tetap gratis dan ringan.");
+        alert("PENTING: Untuk dokumen (PDF) atau Video, silakan gunakan kolom 'Paste URL'. Tombol Upload ini dikhususkan untuk Gambar Sampul saja.");
         return;
     }
     
@@ -3454,8 +3453,6 @@ const handleUpload = async (e, field) => {
         setUploadMsg(`Error: Gagal memproses (${error.message}).`);
         setIsUploading(false);
     }
-};
-      setIsUploading(false);
 };
         const handleSave = async (e) => {
             e.preventDefault(); setIsSubmitting(true);
