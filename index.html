@@ -3867,8 +3867,18 @@ const compressImage = (file) => {
       });
       const myCoursesView = allCoursesView.filter(c => c.enrolledBySiswa);
 
-      const BankSoalAdmin = () => {
-    const [view, setView] = useState('list'); // 'list' untuk lihat daftar, 'form' untuk nambah soal
+const BankSoalAdmin = () => {
+    const [view, setView] = useState('list');
+    const [form, setForm] = useState({ pertanyaan: '', a: '', b: '', c: '', d: '', kunci: 'a' });
+
+    const handleSimpan = () => {
+        if (!form.pertanyaan || !form.a || !form.b || !form.c || !form.d) {
+            alert("Peringatan: Mohon lengkapi teks pertanyaan dan semua pilihan ganda (A, B, C, D)!");
+            return;
+        }
+        alert("Sukses! Tampilan form bekerja sempurna. (Sistem penyimpanan ke Database akan kita pasang di langkah berikutnya)");
+        console.log("Data Soal yang diketik:", form);
+    };
 
     return (
         <div className="p-4 md:p-6 w-full max-w-5xl mx-auto space-y-6 animate-slide-up pb-24">
@@ -3897,15 +3907,59 @@ const compressImage = (file) => {
                         <Button variant="ghost" onClick={() => setView('list')} className="text-slate-400 hover:text-rose-500"><X size={20} /></Button>
                     </div>
                     
-                    <div className="p-8 text-center bg-slate-50 dark:bg-slate-950 rounded-2xl">
-                        <p className="text-slate-500 font-medium animate-pulse">🛠️ Area isian Pertanyaan, Pilihan Ganda (A, B, C, D), dan Kunci Jawaban akan kita rakit di sini pada tahap selanjutnya! 🚀</p>
+                    <div className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Teks Pertanyaan</label>
+                            <textarea 
+                                className="w-full p-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-0 transition-colors"
+                                rows="3"
+                                placeholder="Ketikkan pertanyaan soal di sini..."
+                                value={form.pertanyaan}
+                                onChange={(e) => setForm({...form, pertanyaan: e.target.value})}
+                            ></textarea>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {['a', 'b', 'c', 'd'].map(opt => (
+                                <div key={opt}>
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase">Pilihan {opt}</label>
+                                    <input 
+                                        type="text"
+                                        className="w-full p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 transition-colors"
+                                        placeholder={`Ketik teks jawaban ${opt.toUpperCase()}...`}
+                                        value={form[opt]}
+                                        onChange={(e) => setForm({...form, [opt]: e.target.value})}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 mt-4">
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 mt-4">Kunci Jawaban Benar</label>
+                            <select 
+                                className="w-full p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-white font-bold cursor-pointer"
+                                value={form.kunci}
+                                onChange={(e) => setForm({...form, kunci: e.target.value})}
+                            >
+                                <option value="a">Pilihan A</option>
+                                <option value="b">Pilihan B</option>
+                                <option value="c">Pilihan C</option>
+                                <option value="d">Pilihan D</option>
+                            </select>
+                        </div>
+
+                        <div className="pt-6 flex justify-end gap-3">
+                            <Button variant="outline" onClick={() => setView('list')} className="px-6">Batal</Button>
+                            <Button onClick={handleSimpan} className="bg-blue-600 hover:bg-blue-700 text-white border-none px-8">
+                                Simpan ke Bank Soal
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}
         </div>
     );
 };
-
       const renderContent = () => {
         switch (activeMenu) {
           case 'dashboard': 
