@@ -3378,21 +3378,65 @@ const handleAdd = () => { setFormData({ id: 'lib_' + Date.now().toString(36), ti
             } catch(e) { console.error("Gagal hapus:", e); }
         };
 
-        const handleUpload = async (e, field) => {
-            const file = e.target.files[0];
-            if(!file || !storage) return;
-            setIsUploading(true); setUploadMsg('Sedang mengunggah file...');
-            try {
-                const safeFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-                const storageRef = ref(storage, `library/${Date.now()}_${safeFileName}`);
-                const snapshot = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(snapshot.ref);
-                setFormData(prev => ({...prev, [field]: url}));
-                setUploadMsg('Sukses: File berhasil diunggah!');
-            } catch (error) { setUploadMsg(`Error: Gagal mengunggah (${error.message}).`); }
-            setIsUploading(false);
-        };
+      // --- MESIN KOMPRESOR GAMBAR OTOMATIS ---
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) {
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const MAX_WIDTH = 1000;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          const compressedFile = new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', 0.7);
+      };
+    };
+  });
+};
+const handleUpload = async (e, field) => {
+    const rawFile = e.target.files[0];
+    if (!rawFile || !storage) return;
+    
+    setIsUploading(true); // Pastikan ini sesuai dengan nama state loading Anda (misal isUploading atau setIsUploadingTask)
+    setUploadMsg('Mengompres dan mengunggah file...');
+    
+    // PANGGIL MESIN KOMPRESOR DI SINI
+    const file = await compressImage(rawFile); 
 
+    try {
+        const safeFileName = file.name.replace(/[^a-zA-Z0-9]/g, '_');
+        const storageRef = ref(storage, `library/${Date.now()}_${safeFileName}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        
+        setFormData(prev => ({...prev, [field]: url}));
+        setUploadMsg('Sukses: File berhasil diunggah!');
+    } catch (error) {
+        console.error("Gagal mengunggah:", error);
+        setUploadMsg(`Error: Gagal mengunggah (${error.message}).`);
+    }
+    setIsUploading(false);
+};
         const handleSave = async (e) => {
             e.preventDefault(); setIsSubmitting(true);
             try {
