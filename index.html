@@ -3891,7 +3891,7 @@ const BankSoalAdmin = ({ db }) => {
         }
     }, [db]);
 
-// Mesin AI Pembaca Teks & Pembuat Soal Bahasa Arab Tingkat Lanjut
+// Mesin AI Pembuat Soal Berbasis Kunci Format Baru (AQ...)
     const handleGenerateAi = async () => {
         if (!topikAi) {
             alert("Silakan ketik atau *paste* teks materi/topik bahasa Arab terlebih dahulu di kotak asisten!");
@@ -3899,7 +3899,7 @@ const BankSoalAdmin = ({ db }) => {
         }
         setIsGenerating(true);
         try {
-            // Masukkan API Key Gemini Anda di sini (Ganti teks 'MASUKKAN_API_KEY_ANDA_DISINI' dengan kunci asli Anda)
+            // Tempel kunci AQ... Anda di sini
             const apiKey = "AQ.Ab8RN6JzoJ53KAZcIEKGH5ZwSY72wToe0V0w-jbj1E2F7OhJwQ"; 
             
             const promptGemini = `Anda adalah seorang Ustadz dan ahli penyusun soal evaluasi Bahasa Arab dan Keislaman. 
@@ -3915,9 +3915,13 @@ const BankSoalAdmin = ({ db }) => {
               "kunci": "a"
             }`;
 
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            // Mengirimkan kunci menggunakan Header Authorization agar format AQ... diterima oleh server Google
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: promptGemini }] }]
                 })
@@ -3943,7 +3947,7 @@ const BankSoalAdmin = ({ db }) => {
             alert("Alhamdulillah! Soal berhasil di-generate AI dengan sangat akurat! ✨");
         } catch (error) {
             console.error("Gagal AI:", error);
-            alert("Gagal terhubung ke AI. Pastikan API Key Anda sudah dimasukkan dengan benar di kode.");
+            alert("Gagal terhubung ke AI. Pastikan format kunci sudah terpasang dengan benar.");
         }
         setIsGenerating(false);
     };
