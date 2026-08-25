@@ -3873,7 +3873,6 @@ const BankSoalAdmin = ({ db }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [soalList, setSoalList] = useState([]);
 
-    // Mesin Penarik Data Firestore
     useEffect(() => {
         if (!db) return;
         try {
@@ -3890,7 +3889,6 @@ const BankSoalAdmin = ({ db }) => {
         }
     }, [db]);
 
-    // Mesin Penyimpan Data ke Firestore
     const handleSimpan = async () => {
         if (!form.pertanyaan || !form.a || !form.b || !form.c || !form.d) {
             alert("Peringatan: Mohon lengkapi teks pertanyaan dan semua pilihan ganda!");
@@ -4010,86 +4008,6 @@ const BankSoalAdmin = ({ db }) => {
                                 className="bg-blue-600 hover:bg-blue-700 text-white border-none px-8"
                             >
                                 {isSaving ? "Menyimpan..." : "Simpan ke Bank Soal"}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-      return (
-        <div className="p-4 md:p-6 w-full max-w-5xl mx-auto space-y-6 animate-slide-up pb-24">
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <Badge variant="blue" className="mb-2">PUSAT EVALUASI</Badge>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Bank Soal Pusat</h1>
-                </div>
-                {view === 'list' && (
-                    <Button onClick={() => setView('form')} className="gap-2 border-none bg-blue-600 hover:bg-blue-700 text-white">
-                        <PlusCircle size={18} /> Tambah Soal
-                    </Button>
-                )}
-            </div>
-
-            {view === 'list' ? (
-                <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl shadow-sm border-2 border-dashed border-slate-200 dark:border-slate-800 text-center mt-8">
-                    <FileQuestion size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                    <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">Belum Ada Soal</h3>
-                    <p className="text-slate-500 max-w-md mx-auto">Bank soal masih kosong. Klik tombol "Tambah Soal" di atas untuk mulai membuat pertanyaan pertama Anda.</p>
-                </div>
-            ) : (
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mt-4">
-                    <div className="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
-                        <h2 className="text-xl font-bold text-slate-800 dark:text-white">Formulir Tambah Soal</h2>
-                        <Button variant="ghost" onClick={() => setView('list')} className="text-slate-400 hover:text-rose-500"><X size={20} /></Button>
-                    </div>
-                    
-                    <div className="space-y-5">
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Teks Pertanyaan</label>
-                            <textarea 
-                                className="w-full p-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-0 transition-colors"
-                                rows="3"
-                                placeholder="Ketikkan pertanyaan soal di sini..."
-                                value={form.pertanyaan}
-                                onChange={(e) => setForm({...form, pertanyaan: e.target.value})}
-                            ></textarea>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {['a', 'b', 'c', 'd'].map(opt => (
-                                <div key={opt}>
-                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase">Pilihan {opt}</label>
-                                    <input 
-                                        type="text"
-                                        className="w-full p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 transition-colors"
-                                        placeholder={`Ketik teks jawaban ${opt.toUpperCase()}...`}
-                                        value={form[opt]}
-                                        onChange={(e) => setForm({...form, [opt]: e.target.value})}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 mt-4">
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 mt-4">Kunci Jawaban Benar</label>
-                            <select 
-                                className="w-full p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-white font-bold cursor-pointer"
-                                value={form.kunci}
-                                onChange={(e) => setForm({...form, kunci: e.target.value})}
-                            >
-                                <option value="a">Pilihan A</option>
-                                <option value="b">Pilihan B</option>
-                                <option value="c">Pilihan C</option>
-                                <option value="d">Pilihan D</option>
-                            </select>
-                        </div>
-
-                        <div className="pt-6 flex justify-end gap-3">
-                            <Button variant="outline" onClick={() => setView('list')} className="px-6">Batal</Button>
-                            <Button onClick={handleSimpan} className="bg-blue-600 hover:bg-blue-700 text-white border-none px-8">
-                                Simpan ke Bank Soal
                             </Button>
                         </div>
                     </div>
