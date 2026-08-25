@@ -3867,6 +3867,45 @@ const compressImage = (file) => {
       });
       const myCoursesView = allCoursesView.filter(c => c.enrolledBySiswa);
 
+      const BankSoalAdmin = () => {
+    const [view, setView] = useState('list'); // 'list' untuk lihat daftar, 'form' untuk nambah soal
+
+    return (
+        <div className="p-4 md:p-6 w-full max-w-5xl mx-auto space-y-6 animate-slide-up pb-24">
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <Badge variant="blue" className="mb-2">PUSAT EVALUASI</Badge>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Bank Soal Pusat</h1>
+                </div>
+                {view === 'list' && (
+                    <Button onClick={() => setView('form')} className="gap-2 border-none bg-blue-600 hover:bg-blue-700 text-white">
+                        <PlusCircle size={18} /> Tambah Soal
+                    </Button>
+                )}
+            </div>
+
+            {view === 'list' ? (
+                <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl shadow-sm border-2 border-dashed border-slate-200 dark:border-slate-800 text-center mt-8">
+                    <FileQuestion size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+                    <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">Belum Ada Soal</h3>
+                    <p className="text-slate-500 max-w-md mx-auto">Bank soal masih kosong. Klik tombol "Tambah Soal" di atas untuk mulai membuat pertanyaan pertama Anda.</p>
+                </div>
+            ) : (
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mt-4">
+                    <div className="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white">Formulir Tambah Soal</h2>
+                        <Button variant="ghost" onClick={() => setView('list')} className="text-slate-400 hover:text-rose-500"><X size={20} /></Button>
+                    </div>
+                    
+                    <div className="p-8 text-center bg-slate-50 dark:bg-slate-950 rounded-2xl">
+                        <p className="text-slate-500 font-medium animate-pulse">🛠️ Area isian Pertanyaan, Pilihan Ganda (A, B, C, D), dan Kunci Jawaban akan kita rakit di sini pada tahap selanjutnya! 🚀</p>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
       const renderContent = () => {
         switch (activeMenu) {
           case 'dashboard': 
@@ -3887,7 +3926,7 @@ const compressImage = (file) => {
           case 'manajemen-perpustakaan': return <ManajemenPerpustakaanAdmin libraryData={libraryData} db={db} storage={storage} />;
           case 'persetujuan': return <PersetujuanAdmin enrollments={safeEnrollments} courses={safeCourses} usersData={usersData} db={db} />;
           case 'validasi-pendaftaran': return <ValidasiPendaftaranAdmin registrations={registrations} db={db} usersData={usersData} courses={safeCourses} />;
-          case 'bank-soal': return <div className="p-8 w-full max-w-5xl mx-auto"><h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">Bank Soal Pusat</h2><div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-center"><p className="text-slate-500">Ruangan Bank Soal sedang dalam tahap pembangunan 🚧</p></div></div>;
+          case 'bank-soal': return <BankSoalAdmin />;
           default: return <div className="p-10 text-center text-slate-500">Halaman tidak ditemukan.</div>;
         }
       };
