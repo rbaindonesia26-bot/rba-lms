@@ -3322,13 +3322,13 @@
 
     const ManajemenPerpustakaanAdmin = ({ libraryData, db, storage }) => {
         const [view, setView] = useState('list');
-        const [formData, setFormData] = useState({ id: '', title: '', desc: '', type: 'Kitab PDF', url: '', coverUrl: '' });
-        const [isSubmitting, setIsSubmitting] = useState(false);
+const [formData, setFormData] = useState({ id: '', title: '', desc: '', type: 'Kitab PDF', url: '', coverUrl: '', isPremium: false, price: '' });
+      const [isSubmitting, setIsSubmitting] = useState(false);
         const [isUploading, setIsUploading] = useState(false);
         const [uploadMsg, setUploadMsg] = useState('');
 
-        const handleAdd = () => { setFormData({ id: 'lib_' + Date.now().toString(36), title: '', desc: '', type: 'Kitab PDF', url: '', coverUrl: '' }); setUploadMsg(''); setView('form'); };
-        const handleEdit = (item) => { setFormData(item); setUploadMsg(''); setView('form'); };
+const handleAdd = () => { setFormData({ id: 'lib_' + Date.now().toString(36), title: '', desc: '', type: 'Kitab PDF', url: '', coverUrl: '', isPremium: false, price: '' }); setUploadMsg(''); setView('form'); };
+      const handleEdit = (item) => { setFormData(item); setUploadMsg(''); setView('form'); };
         
         const handleDelete = async (id) => {
             if(!window.confirm('Hapus koleksi ini dari perpustakaan?')) return;
@@ -3386,6 +3386,35 @@
                               <option value="Aplikasi">Aplikasi Edukatif</option>
                           </select>
                       </div>
+                     {/* --- TAMBAHAN KOTAK PREMIUM & HARGA --- */}
+        <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-200 dark:border-amber-800/30 my-4">
+            <label className="flex items-center gap-3 cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    checked={formData.isPremium || false} 
+                    onChange={e => setFormData({...formData, isPremium: e.target.checked})}
+                    className="w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500 cursor-pointer"
+                />
+                <span className="text-sm font-bold text-amber-800 dark:text-amber-400">Jadikan Produk Premium (Berbayar)?</span>
+            </label>
+
+            {formData.isPremium && (
+                <div className="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800/30 animate-slide-up">
+                    <label className="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">Harga Jual (Rp)</label>
+                    <input 
+                        type="number" 
+                        placeholder="Contoh: 49000"
+                        value={formData.price || ''} 
+                        onChange={e => setFormData({...formData, price: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white dark:bg-[#0B1120] focus:ring-2 focus:ring-amber-500 outline-none"
+                    />
+                    <p className="text-xs text-amber-600 dark:text-amber-500 mt-2 font-medium">
+                        *Ketik angka saja tanpa titik. E-book premium wajib mencantumkan URL gambar baliho di kolom "Cover/Sampul" di bawah.
+                    </p>
+                </div>
+            )}
+        </div>
+        {/* --- AKHIR TAMBAHAN --- */}
 
                       <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                          <label className="block text-sm font-bold mb-2">File Sumber / URL Tautan</label>
