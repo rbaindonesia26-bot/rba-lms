@@ -3415,27 +3415,47 @@ const compressImage = (file) => {
 };
 const handleUpload = async (e, field) => {
     const rawFile = e.target.files[0];
-    if (!rawFile || !storage) return;
-    
-    setIsUploading(true); // Pastikan ini sesuai dengan nama state loading Anda (misal isUploading atau setIsUploadingTask)
-    setUploadMsg('Mengompres dan mengunggah file...');
-    
-    // PANGGIL MESIN KOMPRESOR DI SINI
-    const file = await compressImage(rawFile); 
+    if (!rawFile) return;
 
-    try {
-        const safeFileName = file.name.replace(/[^a-zA-Z0-9]/g, '_');
-        const storageRef = ref(storage, `library/${Date.now()}_${safeFileName}`);
-        const snapshot = await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(snapshot.ref);
-        
-        setFormData(prev => ({...prev, [field]: url}));
-        setUploadMsg('Sukses: File berhasil diunggah!');
-    } catch (error) {
-        console.error("Gagal mengunggah:", error);
-        setUploadMsg(`Error: Gagal mengunggah (${error.message}).`);
+    // TRIK RAHASIA: Karena kita simpan di database teks, kita hanya izinkan gambar. 
+    // Dokumen PDF ukurannya terlalu besar untuk trik ini.
+    if (!rawFile.type.startsWith('image/')) {
+        alert("PENTING: Untuk dokumen (PDF) atau Video, silakan gunakan kolom 'Paste URL'. Tombol Upload ini sekarang dikhususkan untuk Gambar Sampul saja agar sistem tetap gratis dan ringan.");
+        return;
     }
-    setIsUploading(false);
+    
+    setIsUploading(true); 
+    setUploadMsg('Mengompres dan memproses gambar...');
+    
+    try {
+        // 1. Panggil mesin kompresor gambar
+        const compressedFile = await compressImage(rawFile); 
+
+        // 2. Ubah gambar fisik menjadi teks sandi (Base64)
+        const reader = new FileReader();
+        reader.readAsDataURL(compressedFile);
+        
+        // 3. Setelah selesai diubah, simpan ke sistem
+        reader.onload = () => {
+            const base64String = reader.result; 
+            
+            setFormData(prev => ({...prev, [field]: base64String}));
+            setUploadMsg('Sukses: Gambar berhasil diproses!');
+            setIsUploading(false);
+        };
+        
+        reader.onerror = (error) => {
+            console.error("Gagal membaca file:", error);
+            setUploadMsg('Error: Gagal memproses gambar.');
+            setIsUploading(false);
+        };
+    } catch (error) {
+        console.error("Gagal memproses:", error);
+        setUploadMsg(`Error: Gagal memproses (${error.message}).`);
+        setIsUploading(false);
+    }
+};
+      setIsUploading(false);
 };
         const handleSave = async (e) => {
             e.preventDefault(); setIsSubmitting(true);
