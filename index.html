@@ -3923,18 +3923,23 @@ const BankSoalAdmin = ({ db }) => {
         setIsSaving(false);
     };
 
-    return (
-        <div className="p-4 md:p-6 w-full max-w-5xl mx-auto space-y-6 animate-slide-up pb-24">
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <Badge variant="blue" className="mb-2">PUSAT EVALUASI</Badge>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Bank Soal Pusat</h1>
+<div className="pt-6 flex justify-end gap-3">
+                            <Button variant="outline" onClick={() => setView('list')} className="px-6">Batal</Button>
+                            <Button 
+                                onClick={handleSimpan} 
+                                disabled={isSaving}
+                                className="bg-blue-600 hover:bg-blue-700 text-white border-none px-8"
+                            >
+                                {isSaving ? "Menyimpan..." : "Simpan ke Bank Soal"}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-                {view === 'list' && (
-                    <Button onClick={() => setView('form')} className="gap-2 border-none bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30">
-                        <PlusCircle size={18} /> Tambah Soal
-                    </Button>
-                )}
+            )}
+        </div>
+    );
+};
+    )}
             </div>
 
             {view === 'list' ? (
