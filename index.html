@@ -3891,7 +3891,7 @@ const BankSoalAdmin = ({ db }) => {
         }
     }, [db]);
 
-// Mesin AI Pembuat Soal Super Aman & Pasti Muncul
+// Mesin AI Pembuat Soal Pilihan Ganda Profesional Berdasarkan Teks Anda
     const handleGenerateAi = async () => {
         if (!topikAi) {
             alert("Silakan ketik atau *paste* teks materi/topik bahasa Arab terlebih dahulu di kotak asisten!");
@@ -3899,14 +3899,17 @@ const BankSoalAdmin = ({ db }) => {
         }
         setIsGenerating(true);
         try {
-            const promptText = `Buatkan 1 soal pilihan ganda bahasa Arab beserta harakat lengkap berdasarkan topik/materi berikut: "${topikAi}". 
-            Berikan jawabannya dalam format JSON mentah dengan struktur persis seperti ini:
+            const promptText = `Anda adalah seorang Ustadz dan ahli pembuat soal evaluasi Bahasa Arab. 
+            Berikut adalah materi/teks acuan dari pengguna: "${topikAi}".
+            Tugas Anda: Buatlah 1 soal pilihan ganda (Multiple Choice) yang berbobot, menanyakan isi atau makna dari materi tersebut. 
+            PENTING: Jangan menyalin teks acuan mentah-mentah ke pilihan jawaban. Buatlah kalimat pilihan A, B, C, dan D yang berbeda (ada 1 jawaban benar dan 3 pengecoh yang logis dalam bahasa Arab).
+            Berikan jawabannya HANYA dalam format JSON mentah tanpa teks lain dengan struktur persis seperti ini:
             {
-              "pertanyaan": "Teks pertanyaan berbahasa Arab lengkap dengan harakat...",
-              "a": "Pilihan A...",
-              "b": "Pilihan B...",
-              "c": "Pilihan C...",
-              "d": "Pilihan D...",
+              "pertanyaan": "Kalimat pertanyaan baru dalam bahasa Arab berdasarkan materi di atas?",
+              "a": "Pilihan jawaban pertama...",
+              "b": "Pilihan jawaban kedua...",
+              "c": "Pilihan jawaban ketiga...",
+              "d": "Pilihan jawaban keempat...",
               "kunci": "a"
             }`;
 
@@ -3921,8 +3924,6 @@ const BankSoalAdmin = ({ db }) => {
             });
             
             const rawText = await res.text();
-            
-            // Pembersihan tingkat lanjut agar aman dari segala format teks
             let cleanJson = rawText.trim();
             if (cleanJson.includes("```")) {
                 const parts = cleanJson.split("```");
@@ -3937,30 +3938,21 @@ const BankSoalAdmin = ({ db }) => {
             const parsedSoal = JSON.parse(cleanJson);
 
             setForm({
-                pertanyaan: parsedSoal.pertanyaan || `ما حكم أو تفصيل ${topikAi}?`,
-                a: parsedSoal.a || `الخيار الأول المتعلق بـ ${topikAi}`,
-                b: parsedSoal.b || `الخيار الثاني المتعلق بـ ${topikAi}`,
-                c: parsedSoal.c || `الخيار الثالث المتعلق بـ ${topikAi}`,
-                d: parsedSoal.d || `الخيار الرابع المتعلق بـ ${topikAi}`,
+                pertanyaan: parsedSoal.pertanyaan || '',
+                a: parsedSoal.a || '',
+                b: parsedSoal.b || '',
+                c: parsedSoal.c || '',
+                d: parsedSoal.d || '',
                 kunci: parsedSoal.kunci ? parsedSoal.kunci.toLowerCase() : 'a'
             });
-            alert("Alhamdulillah! Soal berhasil di-generate dan dimasukkan ke form! ✨");
+            alert("Alhamdulillah! Soal pilihan ganda berhasil di-generate dari teks Anda! ✨");
         } catch (error) {
             console.error("Gagal parse:", error);
-            // Fallback otomatis langsung isi teks jika format meleset
-            setForm({
-                pertanyaan: `بناءً على النص: (${topikAi})، ما هو البيان الصحيح؟`,
-                a: `الخيار الأول المأخوذ من النص`,
-                b: `الخيار الثاني المأخوذ من النص`,
-                c: `الخيار الثالث المأخوذ من النص`,
-                d: `الخيار الرابع المأخوذ من النص`,
-                kunci: 'a'
-            });
-            alert("Soal berhasil dibuat otomatis ke formulir!");
+            alert("Gagal memproses soal. Silakan coba klik Generate AI sekali lagi.");
         }
         setIsGenerating(false);
     };
-  
+    
     const handleSimpan = async () => {
         if (!form.pertanyaan || !form.a || !form.b || !form.c || !form.d) {
             alert("Peringatan: Mohon lengkapi teks pertanyaan dan semua pilihan ganda!");
