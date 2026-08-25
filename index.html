@@ -3887,6 +3887,7 @@ const compressImage = (file) => {
           case 'manajemen-perpustakaan': return <ManajemenPerpustakaanAdmin libraryData={libraryData} db={db} storage={storage} />;
           case 'persetujuan': return <PersetujuanAdmin enrollments={safeEnrollments} courses={safeCourses} usersData={usersData} db={db} />;
           case 'validasi-pendaftaran': return <ValidasiPendaftaranAdmin registrations={registrations} db={db} usersData={usersData} courses={safeCourses} />;
+          case 'bank-soal': return <div className="p-8 w-full max-w-5xl mx-auto"><h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">Bank Soal Pusat</h2><div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-center"><p className="text-slate-500">Ruangan Bank Soal sedang dalam tahap pembangunan 🚧</p></div></div>;
           default: return <div className="p-10 text-center text-slate-500">Halaman tidak ditemukan.</div>;
         }
       };
