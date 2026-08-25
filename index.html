@@ -2161,6 +2161,40 @@
       const [apiKeyInput, setApiKeyInput] = useState('');
       const [modulToDelete, setModulToDelete] = useState(null);
 
+      const handleUpload = async (e, field) => {
+    const rawFile = e.target.files[0];
+    if (!rawFile) return;
+
+    if (!rawFile.type.startsWith('image/')) {
+        alert("PENTING: Tombol ini khusus untuk Gambar Sampul Program.");
+        return;
+    }
+    
+    setIsUploading(true); 
+    setUploadMsg('Mengompres gambar...');
+    
+    try {
+        const compressedFile = await compressImage(rawFile); 
+        const reader = new FileReader();
+        reader.readAsDataURL(compressedFile);
+        
+        reader.onload = () => {
+            setFormData(prev => ({...prev, [field]: reader.result}));
+            setUploadMsg('Sukses: Gambar berhasil diproses!');
+            setIsUploading(false);
+        };
+        
+        reader.onerror = (error) => {
+            console.error("Gagal membaca file:", error);
+            setUploadMsg('Error: Gagal memproses gambar.');
+            setIsUploading(false);
+        };
+    } catch (error) {
+        console.error("Gagal memproses:", error);
+        setUploadMsg(`Error: Gagal memproses (${error.message}).`);
+        setIsUploading(false);
+    }
+};
       const getModulMeta = (type) => {
          switch(type) {
              case 'youtube': return { icon: Youtube, color: 'text-rose-600', label: 'YouTube' };
@@ -2396,13 +2430,13 @@
                         </select>
                      </div>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                     <label className="block text-sm font-bold mb-2">Gambar Sampul (Opsional)</label>
-                     <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="mb-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-100 file:text-blue-700" />
-                     {uploadMsg && <p className="text-xs font-bold text-blue-600 mb-2">{uploadMsg}</p>}
-                     <input type="text" placeholder="Atau paste URL gambar di sini..." value={formData.coverUrl || ''} onChange={e => setFormData({...formData, coverUrl: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-blue-600 text-sm" />
-                  </div>
-                  <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+<div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+    <label className="block text-sm font-bold mb-2">Gambar Sampul (Opsional)</label>
+    <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'coverUrl')} disabled={isUploading} className="mb-3 w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-800 dark:file:text-slate-300" />
+    {uploadMsg && <p className={`mt-2 mb-2 text-xs font-bold ${uploadMsg.includes('Error') ? 'text-rose-600' : 'text-blue-600'}`}>{uploadMsg}</p>}
+    <input type="text" placeholder="Atau paste URL gambar di sini..." value={formData.coverUrl || ''} onChange={e => setFormData({...formData, coverUrl: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white dark:bg-[#0B1120] focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+</div>
+                 <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
                      <Button type="button" variant="ghost" onClick={() => setView('list')}>Batal</Button>
                      <Button type="submit" disabled={isSubmitting || isUploading} className="gap-2 border-none"><Save size={18}/> Simpan Program</Button>
                   </div>
