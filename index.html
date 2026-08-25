@@ -3891,29 +3891,31 @@ const BankSoalAdmin = ({ db }) => {
         }
     }, [db]);
 
-// Mesin AI Generator Berbasis Gemini API yang Fasih Bahasa Arab
+// Mesin AI Pembaca Teks & Pembuat Soal Bahasa Arab Tingkat Lanjut
     const handleGenerateAi = async () => {
         if (!topikAi) {
-            alert("Silakan ketik topik atau materi soal terlebih dahulu (contoh: 'العقيدة' atau 'التجويد')!");
+            alert("Silakan ketik atau *paste* teks materi/topik bahasa Arab terlebih dahulu di kotak asisten!");
             return;
         }
         setIsGenerating(true);
         try {
-            // Menggunakan API Gemini Resmi yang sangat cerdas berbahasa Arab & berharakat
-            const apiKey = ""; // Otomatis menggunakan endpoint publik cerdas
-            const promptGemini = `Buatkan 1 buah soal pilihan ganda bahasa Arab berkualitas tinggi beserta harakat lengkap mengenai topik atau teks berikut: "${topikAi}". 
-            Berikan jawabannya HANYA dalam format JSON mentah tanpa teks pembuka atau penutup, dengan struktur persis seperti ini:
+            // Masukkan API Key Gemini Anda di sini (Ganti teks 'MASUKKAN_API_KEY_ANDA_DISINI' dengan kunci asli Anda)
+            const apiKey = "AQ.Ab8RN6JzoJ53KAZcIEKGH5ZwSY72wToe0V0w-jbj1E2F7OhJwQ"; 
+            
+            const promptGemini = `Anda adalah seorang Ustadz dan ahli penyusun soal evaluasi Bahasa Arab dan Keislaman. 
+            Analisis teks atau topik berikut dengan teliti: "${topikAi}".
+            Buatlah 1 soal pilihan ganda yang sangat akurat, profesional, dan relevan dengan teks tersebut, lengkap dengan harakat yang benar.
+            Berikan hasilnya HANYA dalam format JSON mentah tanpa teks tambahan apapun, dengan struktur persis seperti ini:
             {
-              "pertanyaan": "Teks pertanyaan dalam bahasa Arab lengkap dengan harakat...",
-              "a": "Pilihan A dalam bahasa Arab...",
-              "b": "Pilihan B dalam bahasa Arab...",
-              "c": "Pilihan C dalam bahasa Arab...",
-              "d": "Pilihan D dalam bahasa Arab...",
+              "pertanyaan": "Teks pertanyaan berbahasa Arab lengkap dengan harakat...",
+              "a": "Pilihan A...",
+              "b": "Pilihan B...",
+              "c": "Pilihan C...",
+              "d": "Pilihan D...",
               "kunci": "a"
             }`;
 
-            // Menggunakan model generative AI publik yang mendukung multibahasa
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -3922,9 +3924,11 @@ const BankSoalAdmin = ({ db }) => {
             });
             
             const data = await res.json();
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
             let rawText = data.candidates[0].content.parts[0].text;
-            
-            // Membersihkan format markdown
             rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
             const parsedSoal = JSON.parse(rawText);
 
@@ -3936,19 +3940,10 @@ const BankSoalAdmin = ({ db }) => {
                 d: parsedSoal.d || '',
                 kunci: parsedSoal.kunci ? parsedSoal.kunci.toLowerCase() : 'a'
             });
-            alert("Alhamdulillah! Soal bahasa Arab berhasil di-generate AI dengan sempurna! ✨");
+            alert("Alhamdulillah! Soal berhasil di-generate AI dengan sangat akurat! ✨");
         } catch (error) {
             console.error("Gagal AI:", error);
-            // Fallback cerdas jika jaringan publik sibuk
-            setForm({
-                pertanyaan: `ما the definition or explanation related to: ${topikAi}?`,
-                a: `الخيار الأول الصحيح المتعلق بـ ${topikAi}`,
-                b: `الخيار الثاني المتعلق بـ ${topikAi}`,
-                c: `الخيار الثالث المتعلق بـ ${topikAi}`,
-                d: `الخيار الرابع المتعلق بـ ${topikAi}`,
-                kunci: 'a'
-            });
-            alert("Silakan sesuaikan teks bahasa Arab pada form di bawah.");
+            alert("Gagal terhubung ke AI. Pastikan API Key Anda sudah dimasukkan dengan benar di kode.");
         }
         setIsGenerating(false);
     };
