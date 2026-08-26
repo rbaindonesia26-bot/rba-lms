@@ -3874,7 +3874,7 @@ const compressImage = (file) => {
 
 const BankSoalAdmin = ({ db }) => {
     const [view, setView] = useState('list');
-    const [form, setForm] = useState({ pertanyaan: '', a: '', b: '', c: '', d: '', kunci: 'a' });
+    const [form, setForm] = useState({ pertanyaan: '', a: '', b: '', c: '', d: '', kunci: 'a', mapel: 'Nahwu' });
     const [isSaving, setIsSaving] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [soalList, setSoalList] = useState([]);
@@ -3972,6 +3972,7 @@ const BankSoalAdmin = ({ db }) => {
                 c: form.c,
                 d: form.d,
                 kunci: form.kunci,
+                mapel: form.mapel, // <-- TAMBAHKAN BARIS INI
                 createdAt: Date.now()
             });
             setForm({ pertanyaan: '', a: '', b: '', c: '', d: '', kunci: 'a' });
@@ -4048,7 +4049,24 @@ const BankSoalAdmin = ({ db }) => {
                             {isGenerating ? "Meracik Soal..." : "✨ Generate AI"}
                         </Button>
                     </div>
-                    
+
+                  <div>
+    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Pilih Mapel / Kategori</label>
+    <select 
+        className="w-full p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+        value={form.mapel}
+        onChange={(e) => setForm({...form, mapel: e.target.value})}
+    >
+        <option value="Nahwu">Nahwu</option>
+        <option value="Shorof">Shorof</option>
+        <option value="Fiqih">Fiqih</option>
+        <option value="Balaghah">Balaghah</option>
+        <option value="Aqidah">Aqidah</option>
+        <option value="Akhlak">Akhlak</option>
+        <option value="Tahfidz">Tahfidz</option>
+        <option value="Lainnya">Lainnya</option>
+    </select>
+</div>
                     <div className="space-y-5">
                         <div>
                             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Teks Pertanyaan</label>
