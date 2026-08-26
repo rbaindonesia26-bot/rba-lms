@@ -2551,6 +2551,46 @@
                                                 const newQ = { q: '', options: ['', '', '', ''], ans: 0 };
                                                 setModulForm({...modulForm, questions: [...(modulForm.questions || []), newQ]});
                                             }} className="text-orange-600 border-orange-200 text-xs py-1 px-2 h-auto shadow-sm">+ Manual</Button>
+                                           <Button type="button" size="sm" variant="outline" onClick={async () => {
+    try {
+        const querySnapshot = await getDocs(collection(db, "bankSoal"));
+        const allSoal = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Filter soal berdasarkan kategori/mapel modul yang sedang dibuat/diedit (misal dicocokkan dengan judul atau kategori program)
+        // Atau tampilkan seluruh bank soal agar pengajar bisa memilih
+        if (allSoal.length === 0) {
+            alert("Bank soal masih kosong. Silakan buat soal terlebih dahulu di menu Bank Soal Pusat.");
+            return;
+        }
+
+        // Prompt sederhana atau modal pilihan soal bisa dikembangkan, 
+        // atau kita tarik otomatis soal yang mapelnya sesuai dengan judul modul/program
+        let pilihanMapel = prompt("Ketik nama mapel bank soal yang ingin ditarik (Contoh: Nahwu, Shorof, Fiqih):", "Nahwu");
+        if (!pilihanMapel) return;
+
+        const filteredSoal = allSoal.filter(s => s.mapel && s.mapel.toLowerCase() === pilihanMapel.toLowerCase());
+        
+        if (filteredSoal.length === 0) {
+            alert("Tidak ditemukan soal dengan mapel '" + pilihanMapel + "' di Bank Soal.");
+            return;
+        }
+
+        // Masukkan soal-soal tersebut ke dalam modul
+        const formattedSoal = filteredSoal.map(s => ({
+            q: s.pertanyaan,
+            options: [s.a, s.b, s.c, s.d],
+            ans: s.kunci === 'a' ? 0 : s.kunci === 'b' ? 1 : s.kunci === 'c' ? 2 : 3
+        }));
+
+        setModulForm(prev => ({ ...prev, questions: [...(prev.questions || []), ...formattedSoal] }));
+        alert("Berhasil menarik " + formattedSoal.length + " soal mapel " + pilihanMapel + " dari Bank Soal!");
+    } catch (e) {
+        console.error("Gagal ambil bank soal:", e);
+        alert("Gagal mengambil data dari Bank Soal.");
+    }
+}} className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs py-1 px-2 h-auto shadow-sm">
+    📥 Ambil dari Bank Soal
+</Button>
                                          </div>
                                       </div>
                                       
