@@ -2154,6 +2154,10 @@
       
       const [activeCourse, setActiveCourse] = useState(null);
       const [modulForm, setModulForm] = useState({ id: '', title: '', desc: '', type: 'youtube', url: '', questions: [] });
+      const [isMapelModalOpen, setIsMapelModalOpen] = useState(false);
+      const [mapelOptions, setMapelOptions] = useState([]);
+      const [tempAllSoal, setTempAllSoal] = useState([]);
+      const [selectedDropdownMapel, setSelectedDropdownMapel] = useState("");
       const [isModulFormOpen, setIsModulFormOpen] = useState(false);
       const [isGeneratingAI, setIsGeneratingAI] = useState(false);
       
@@ -2554,7 +2558,7 @@
 <Button type="button" size="sm" variant="outline" onClick={() => {
     try {
         const unsub = onSnapshot(collection(db, "bankSoal"), (snapshot) => {
-            unsub(); // Memutus langganan setelah data berhasil ditarik 1 kali
+            unsub(); // Putus koneksi setelah tarik data
             const allSoal = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
             if (allSoal.length === 0) {
@@ -2562,24 +2566,19 @@
                 return;
             }
 
-            let pilihanMapel = prompt("Ketik nama mapel bank soal yang ingin ditarik (Contoh: Nahwu, Shorof, B. Inggris, Fiqih):", "Nahwu");
-            if (!pilihanMapel) return;
-
-            const filteredSoal = allSoal.filter(s => s.mapel && s.mapel.trim().toLowerCase() === pilihanMapel.trim().toLowerCase());
+            // Membaca otomatis semua mapel dan membuang yang ganda
+            const uniqueMapels = [...new Set(allSoal.map(s => s.mapel).filter(m => m && m.trim() !== ''))];
             
-            if (filteredSoal.length === 0) {
-                alert("Tidak ditemukan soal dengan mapel '" + pilihanMapel + "' di Bank Soal.");
-                return;
+            if(uniqueMapels.length === 0) {
+                 alert("Belum ada data Mapel yang tersimpan di Bank Soal Ustadz.");
+                 return;
             }
 
-            const formattedSoal = filteredSoal.map(s => ({
-                q: s.pertanyaan,
-                options: [s.a, s.b, s.c, s.d],
-                ans: s.kunci === 'a' ? 0 : s.kunci === 'b' ? 1 : s.kunci === 'c' ? 2 : 3
-            }));
-
-            setModulForm(prev => ({ ...prev, questions: [...(prev.questions || []), ...formattedSoal] }));
-            alert("Alhamdulillah! Berhasil menarik " + formattedSoal.length + " soal mapel " + pilihanMapel + " ke modul.");
+            // Simpan ke memori dan buka pop-up
+            setMapelOptions(uniqueMapels);
+            setTempAllSoal(allSoal);
+            setSelectedDropdownMapel(uniqueMapels[0]); // Pilih yang pertama otomatis
+            setIsMapelModalOpen(true); 
         }, (error) => {
             console.error("Gagal membaca Firestore:", error);
             alert("Gagal membaca data dari Bank Soal.");
@@ -2591,6 +2590,55 @@
 }} className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs py-1 px-2 h-auto shadow-sm">
     📥 Ambil dari Bank Soal
 </Button>
+
+{/* Jendela Pop-up Modal Canggih */}
+{isMapelModalOpen && (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">📥 Tarik Soal Otomatis</h3>
+            <p className="text-sm text-slate-500 mb-6">Silakan pilih Mata Pelajaran yang sudah tersedia di Bank Soal:</p>
+            
+            <select 
+                value={selectedDropdownMapel}
+                onChange={(e) => setSelectedDropdownMapel(e.target.value)}
+                className="w-full p-3 border-2 border-emerald-200 dark:border-emerald-700 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300 font-bold mb-8 focus:outline-none focus:border-emerald-500"
+            >
+                {mapelOptions.map((m, i) => (
+                    <option key={i} value={m}>{m}</option>
+                ))}
+            </select>
+
+            <div className="flex justify-end gap-3">
+                <button 
+                    type="button" 
+                    onClick={() => setIsMapelModalOpen(false)}
+                    className="px-5 py-2 text-sm font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                >
+                    Batal
+                </button>
+                <button 
+                    type="button" 
+                    onClick={() => {
+                        const filteredSoal = tempAllSoal.filter(s => s.mapel && s.mapel.trim().toLowerCase() === selectedDropdownMapel.trim().toLowerCase());
+                        
+                        const formattedSoal = filteredSoal.map(s => ({
+                            q: s.pertanyaan,
+                            options: [s.a, s.b, s.c, s.d],
+                            ans: s.kunci === 'a' ? 0 : s.kunci === 'b' ? 1 : s.kunci === 'c' ? 2 : 3
+                        }));
+
+                        setModulForm(prev => ({ ...prev, questions: [...(prev.questions || []), ...formattedSoal] }));
+                        alert(`Alhamdulillah! Berhasil menarik ${formattedSoal.length} soal mapel ${selectedDropdownMapel} ke dalam modul ujian.`);
+                        setIsMapelModalOpen(false); // Tutup pop-up
+                    }}
+                    className="px-5 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition-colors"
+                >
+                    🚀 Tarik Soal
+                </button>
+            </div>
+        </div>
+    </div>
+)}
                                          </div>
                                       </div>
                                       
