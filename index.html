@@ -4137,12 +4137,18 @@ const handleSimpan = async () => {
             </button>
             <button 
                 type="button" 
-                onClick={async () => {
-                    if(confirm("Yakin ingin menghapus soal ini dari Bank Soal?")) {
-                        await deleteDoc(doc(db, "bankSoal", soal.id));
-                    }
-                }}
-                className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors shadow-sm"
+onClick={async () => {
+    if(confirm("Yakin ingin menghapus soal ini dari Bank Soal?")) {
+        try {
+            await deleteDoc(doc(db, "bankSoal", soal.id));
+            alert("Alhamdulillah, soal berhasil dihapus dari Bank Soal!");
+        } catch (error) {
+            console.error("Error menghapus:", error);
+            alert("Gagal menghapus soal. Kemungkinan fungsi deleteDoc belum dimuat. Mohon infokan pesan ini.");
+        }
+    }
+}}
+              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors shadow-sm"
                 title="Hapus Soal"
             >
                 <Trash2 size={14}/>
