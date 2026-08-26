@@ -3919,6 +3919,7 @@ const BankSoalAdmin = ({ db }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [soalList, setSoalList] = useState([]);
     const [topikAi, setTopikAi] = useState('');
+    const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
         if (!db) return;
@@ -3998,13 +3999,27 @@ const BankSoalAdmin = ({ db }) => {
         setIsGenerating(false);
     };
     
-    const handleSimpan = async () => {
-        if (!form.pertanyaan || !form.a || !form.b || !form.c || !form.d) {
-            alert("Peringatan: Mohon lengkapi teks pertanyaan dan semua pilihan ganda!");
-            return;
-        }
-        setIsSaving(true);
-        try {
+const handleSimpan = async () => {
+    if (!form.pertanyaan || !form.a || !form.b || !form.c || !form.d) {
+        alert("Peringatan: Mohon lengkapi teks pertanyaan dan semua pilihan ganda!");
+        return;
+    }
+    setIsSaving(true);
+    try {
+        if (editingId) {
+            // Update soal yang sudah ada jika sedang mode edit
+            await updateDoc(doc(db, "bankSoal", editingId), {
+                pertanyaan: form.pertanyaan,
+                a: form.a,
+                b: form.b,
+                c: form.c,
+                d: form.d,
+                kunci: form.kunci,
+                mapel: form.mapel
+            });
+            alert("Alhamdulillah, soal berhasil diperbarui!");
+        } else {
+            // Tambah soal baru jika bukan mode edit
             await addDoc(collection(db, "bankSoal"), {
                 pertanyaan: form.pertanyaan,
                 a: form.a,
@@ -4012,18 +4027,20 @@ const BankSoalAdmin = ({ db }) => {
                 c: form.c,
                 d: form.d,
                 kunci: form.kunci,
-                mapel: form.mapel, // <-- TAMBAHKAN BARIS INI
+                mapel: form.mapel,
                 createdAt: Date.now()
             });
-            setForm({ pertanyaan: '', a: '', b: '', c: '', d: '', kunci: 'a' });
-            setView('list');
-        } catch (error) {
-            console.error(error);
-            alert("Gagal menyimpan ke Database: " + error.message);
+            alert("Alhamdulillah, soal baru berhasil ditambahkan!");
         }
-        setIsSaving(false);
-    };
-
+        setEditingId(null);
+        setForm({ pertanyaan: '', a: '', b: '', c: '', d: '', kunci: 'a', mapel: '' });
+        setView('list');
+    } catch (error) {
+        console.error(error);
+        alert("Gagal menyimpan ke Database: " + error.message);
+    }
+    setIsSaving(false);
+};
     return (
         <div className="p-4 md:p-6 w-full max-w-5xl mx-auto space-y-6 animate-slide-up pb-24">
             <div className="flex justify-between items-center mb-6">
@@ -4048,19 +4065,56 @@ const BankSoalAdmin = ({ db }) => {
                 ) : (
                     <div className="grid grid-cols-1 gap-4 mt-6">
                         {soalList.map((soal, index) => (
-                            <div key={soal.id} className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-left">
-                                <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-3">
-                                    <span className="text-blue-500 mr-2">{soalList.length - index}.</span> {soal.pertanyaan}
-                                </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                    <div className={soal.kunci === 'a' ? "text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg" : "p-2"}>A. {soal.a}</div>
-                                    <div className={soal.kunci === 'b' ? "text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg" : "p-2"}>B. {soal.b}</div>
-                                    <div className={soal.kunci === 'c' ? "text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg" : "p-2"}>C. {soal.c}</div>
-                                    <div className={soal.kunci === 'd' ? "text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg" : "p-2"}>D. {soal.d}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+<div key={soal.id} className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border-2 border-slate-200 dark:border-slate-800 text-left relative">
+    {/* Tombol Edit dan Hapus */}
+    <div className="absolute top-4 right-4 flex gap-2">
+        <button 
+            type="button" 
+            onClick={() => {
+                setEditingId(soal.id);
+                setForm({
+                    pertanyaan: soal.pertanyaan || '',
+                    a: soal.a || '',
+                    b: soal.b || '',
+                    c: soal.c || '',
+                    d: soal.d || '',
+                    kunci: soal.kunci || 'a',
+                    mapel: soal.mapel || ''
+                });
+                setView('form');
+            }}
+            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors text-xs font-bold flex items-center gap-1 shadow-sm"
+            title="Edit Soal"
+        >
+            ✏️ Edit
+        </button>
+        <button 
+            type="button" 
+            onClick={async () => {
+                if(confirm("Yakin ingin menghapus soal ini dari Bank Soal?")) {
+                    await deleteDoc(doc(db, "bankSoal", soal.id));
+                }
+            }}
+            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors shadow-sm"
+            title="Hapus Soal"
+        >
+            <Trash2 size={14}/>
+        </button>
+    </div>
+
+    <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-3 pr-20">
+        <span className="text-blue-500 mr-2">{soalList.length - index}.</span>
+        {soal.pertanyaan}
+        {soal.mapel && <span className="ml-2 text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-semibold">Mapel: {soal.mapel}</span>}
+    </h3>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-slate-300 mb-2">
+        <div className={`p-2 rounded-lg ${soal.kunci === 'a' ? 'text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20' : 'p-2'}`}>A. {soal.a}</div>
+        <div className={`p-2 rounded-lg ${soal.kunci === 'b' ? 'text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20' : 'p-2'}`}>B. {soal.b}</div>
+        <div className={`p-2 rounded-lg ${soal.kunci === 'c' ? 'text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20' : 'p-2'}`}>C. {soal.c}</div>
+        <div className={`p-2 rounded-lg ${soal.kunci === 'd' ? 'text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/20' : 'p-2'}`}>D. {soal.d}</div>
+    </div>
+</div>
+                      </div>
                 )
             ) : (
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mt-4">
