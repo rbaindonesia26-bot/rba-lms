@@ -2999,7 +2999,7 @@
 
                          {!isPengajar && !isCompleted && quizScore !== null && (
                              <div className={`p-5 rounded-xl mb-6 text-center border shadow-sm ${quizScore >= 100 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}>
-                                 <h4 className="font-black text-xl mb-1">{quizScore >= 70 ? '🎉 Alhamdulillah, Anda Lulus!' : '⚠️ Ujian Belum Lulus'}</h4>
+                                 <h4 className="font-black text-xl mb-1">{quizScore >= 100 ? '🎉 Alhamdulillah, Anda Lulus!' : '⚠️ Ujian Belum Lulus'}</h4>
                                  <p className="text-sm">Nilai akhir Anda adalah <span className="font-black text-2xl ml-1">{quizScore}</span></p>
                              </div>
                          )}
@@ -3017,7 +3017,7 @@
 
                                              return (
                                              <label key={oIdx} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${optionClass}`}>
-                                                 <input type="radio" name={`q_${qIdx}`} className="mt-1 shrink-0 w-4 h-4 text-orange-600 focus:ring-orange-500" checked={isPengajar ? isCorrectAnswer : isSelected} onChange={() => setQuizAnswers({...quizAnswers, [qIdx]: oIdx})} disabled={isCompleted || quizScore >= 70 || isPengajar} />
+                                                 <input type="radio" name={`q_${qIdx}`} className="mt-1 shrink-0 w-4 h-4 text-orange-600 focus:ring-orange-500" checked={isPengajar ? isCorrectAnswer : isSelected} onChange={() => setQuizAnswers({...quizAnswers, [qIdx]: oIdx})} disabled={isCompleted || quizScore >= 100 || isPengajar} />
                                                  <span className={`text-sm font-medium leading-snug ${isPengajar && isCorrectAnswer ? 'text-emerald-800 font-bold' : (isSelected ? 'text-orange-900' : 'text-slate-700')}`}>{opt} {isPengajar && isCorrectAnswer && ' (Kunci Jawaban)'}</span>
                                              </label>
                                          )})}
@@ -3116,7 +3116,7 @@
 
       const isCompleted = activeModul && (userProgress || []).includes(activeModul.id);
       const isQuiz = activeModul?.type === 'kuis';
-      const isQuizPassed = isQuiz && quizScore !== null && quizScore >= 70;
+      const isQuizPassed = isQuiz && quizScore !== null && quizScore >= 100;
       const isTugas = activeModul?.type === 'tugas';
       const isTugasSubmitted = isTugas && taskSubmissions[uid] !== undefined;
       const canMarkComplete = (isQuiz && isQuizPassed) || (isTugas && isTugasSubmitted) || (!isQuiz && !isTugas);
