@@ -2984,7 +2984,7 @@
                                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-1">Evaluasi Pemahaman</h3>
                                  <p className="text-sm text-slate-500">
                                      {isPengajar ? 'Mode Pratinjau: Kunci jawaban ditampilkan otomatis.' : 'Kirim jawaban dengan tepat. Nilai minimal kelulusan: '}
-                                     {!isPengajar && <span className="font-bold text-orange-500">70</span>}
+                                     {!isPengajar && <span className="font-bold text-orange-500">100</span>}
                                  </p>
                              </div>
                          </div>
@@ -2998,7 +2998,7 @@
                          )}
 
                          {!isPengajar && !isCompleted && quizScore !== null && (
-                             <div className={`p-5 rounded-xl mb-6 text-center border shadow-sm ${quizScore >= 70 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}>
+                             <div className={`p-5 rounded-xl mb-6 text-center border shadow-sm ${quizScore >= 100 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}>
                                  <h4 className="font-black text-xl mb-1">{quizScore >= 70 ? '🎉 Alhamdulillah, Anda Lulus!' : '⚠️ Ujian Belum Lulus'}</h4>
                                  <p className="text-sm">Nilai akhir Anda adalah <span className="font-black text-2xl ml-1">{quizScore}</span></p>
                              </div>
@@ -3026,7 +3026,7 @@
                              ))}
                          </div>
 
-                         {!isPengajar && !isCompleted && (!quizScore || quizScore < 70) && (
+                         {!isPengajar && !isCompleted && (!quizScore || quizScore < 100) && (
                              <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
                                  <Button size="lg" onClick={handleQuizSubmit} disabled={Object.keys(quizAnswers).length < questions.length} className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white border-none">
                                      {quizScore === null ? 'Kirim Jawaban & Lihat Nilai' : 'Ulangi Ujian'}
