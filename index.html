@@ -3152,8 +3152,8 @@ const handleQuizSubmit = async () => {
                              ))}
                          </div>
 
-                         {!isPengajar && !isCompleted && (!quizScore || quizScore < 100) && (
-                             <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+{!isPengajar && (!isCompleted || quizScore === null) && (!quizScore || quizScore < 100) && (
+  <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
                                  <Button size="lg" onClick={handleQuizSubmit} disabled={Object.keys(quizAnswers).length < questions.length} className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white border-none">
                                      {quizScore === null ? 'Kirim Jawaban & Lihat Nilai' : 'Ulangi Ujian'}
                                  </Button>
