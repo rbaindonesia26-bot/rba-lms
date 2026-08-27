@@ -3244,8 +3244,9 @@ const handleQuizSubmit = async () => {
       const isQuiz = activeModul?.type === 'kuis';
       const isQuizPassed = isQuiz && quizScore !== null && quizScore >= 100;
       const isTugas = activeModul?.type === 'tugas';
-      const isTugasSubmitted = isTugas && taskSubmissions[uid] !== undefined;
-      const canMarkComplete = (isQuiz && isQuizPassed) || (isTugas && isTugasSubmitted) || (!isQuiz && !isTugas);
+      const myTaskScore = (isTugas && taskSubmissions[uid]?.score !== undefined) ? taskSubmissions[uid].score : null;
+      const isTugasPassed = isTugas && myTaskScore >= 100;
+      const canMarkComplete = (isQuiz && isQuizPassed) || (isTugas && isTugasPassed) || (!isQuiz && !isTugas);
       const lockMessage = isQuiz ? "Lulus Kuis Untuk Selesai" : (isTugas ? "Kumpulkan Tugas Untuk Selesai" : "Tandai Selesai");
 
       return (
@@ -3264,8 +3265,10 @@ const handleQuizSubmit = async () => {
                          <div className="flex-1">
                             <Badge variant="slate" className="!text-[10px] uppercase mb-3">{activeModul.type.replace('_', ' ')}</Badge>
                             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-2">{activeModul.title}</h1>
-                            <p className="text-slate-600 text-sm">{activeModul.desc}</p>
-                         </div>
+<div className="bg-blue-50 dark:bg-slate-800 border-l-4 border-blue-500 p-4 mt-2 rounded-r-lg shadow-sm">
+    <p className="text-blue-900 dark:text-blue-100 font-medium whitespace-pre-wrap">{activeModul.desc}</p>
+</div>
+  </div>
                          
                          <div className="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
                             {(role === 'admin' || role === 'guru') ? (
