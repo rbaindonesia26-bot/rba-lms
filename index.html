@@ -3273,12 +3273,12 @@ const handleQuizSubmit = async () => {
                                     <ShieldCheck size={18} className="mr-2"/> Akses Pengajar (Memantau)
                                 </Button>
                             ) : (
-                                isCompleted ? (
-                                    <Button size="md" variant="white" className="w-full sm:w-auto bg-emerald-50 border border-emerald-200 text-emerald-600 cursor-default pointer-events-none">
-                                        <CheckCircle size={18} className="mr-2"/> Selesai Dipelajari
-                                    </Button>
-                                ) : (
-                                    (isQuiz || isTugas) ? (
+(isCompleted && (!isQuiz || quizScore !== null)) ? (
+    <Button size="md" variant="white" className="w-full sm:w-auto bg-emerald-50 border border-emerald-200 text-emerald-600 cursor-default pointer-events-none">
+        <CheckCircle size={18} className="mr-2"/> Selesai Dipelajari
+    </Button>
+) : (
+  (isQuiz || isTugas) ? (
                                         <Button size="md" className={`w-full sm:w-auto text-white border-none transition-all ${canMarkComplete ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`} onClick={() => canMarkComplete ? onMarkComplete(program.id, activeModul.id) : null} disabled={!canMarkComplete}>
                                             {canMarkComplete ? <><Check size={18} className="mr-2"/> Tandai Selesai</> : <><Lock size={18} className="mr-2"/> {lockMessage}</>}
                                         </Button>
