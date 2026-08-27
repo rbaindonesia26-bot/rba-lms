@@ -3107,8 +3107,14 @@ const handleQuizSubmit = async () => {
                          {!isPengajar && isCompleted && (
                              <div className="p-6 rounded-xl mb-6 text-center bg-emerald-50 border border-emerald-200 text-emerald-700">
                                  <CheckCircle size={48} className="mx-auto mb-2 text-emerald-500"/>
-                                 <h4 className="font-black text-xl mb-1">Anda Telah Lulus Ujian Ini</h4>
-                                 <p className="text-sm">Nilai Anda sudah tersimpan. Silakan lanjut ke materi berikutnya.</p>
+<h4 className="font-black text-xl mb-1">Anda Telah Lulus Ujian Ini</h4>
+<p className="text-sm mb-3">Nilai Anda sudah tersimpan. Silakan lanjut ke materi berikutnya.</p>
+{quizScore !== null && (
+    <div className="inline-block bg-white dark:bg-slate-800 px-6 py-2 rounded-full shadow-sm mb-4 border border-emerald-100 dark:border-emerald-700">
+        <span className="text-sm font-bold text-slate-500 mr-2">Skor Muroja'ah Terakhir:</span>
+        <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{quizScore}</span>
+    </div>
+)}
                                <div className="mt-4">
                                     <Button size="sm" onClick={() => { setQuizAnswers({}); setQuizScore(null); }} className="bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-sm">
                                       🔄 Ulangi untuk Murojaah
