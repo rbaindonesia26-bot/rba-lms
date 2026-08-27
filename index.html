@@ -3185,8 +3185,8 @@ const handleQuizSubmit = async () => {
                          {!isPengajarTugas ? (
                              <div className="space-y-6 animate-fade-in">
                                  {mySubmission ? (
-                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center">
-                                         <CheckCircle size={48} className="text-emerald-500 mx-auto mb-3" />
+                                    <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                                        <CheckCircle size={48} className="text-emerald-500 mx-auto mb-3" />
                                          <h4 className="font-bold text-lg mb-2">Tugas Berhasil Terkirim</h4>
                                          <a href={mySubmission.url} target="_blank" className="inline-flex items-center gap-2 text-blue-600 hover:underline mb-6 bg-blue-50 px-4 py-2 rounded-lg font-bold"><Link2 size={18}/> Buka Link Tugas Saya</a><br/>
                                          <div className={`inline-block px-4 py-2 rounded-xl font-bold border ${mySubmission.score !== null ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>
@@ -3194,10 +3194,9 @@ const handleQuizSubmit = async () => {
                                          </div>
                                      </div>
                                  ) : (
-                                     <form onSubmit={handleUploadTask} className="bg-purple-50 border-2 border-dashed border-purple-300 rounded-2xl p-6 sm:p-8 text-center hover:bg-purple-100/50 transition-colors">
-                                         <UploadCloud size={48} className="text-purple-500 mx-auto mb-4" />
-                                         <h4 className="font-bold text-xl text-purple-900 mb-2">Kirim Tautan Tugas</h4>
-                                         <p className="text-sm text-purple-700/80 mb-6 max-w-md mx-auto">Untuk kelancaran sistem, mohon upload file tugas Anda ke <strong>Google Drive</strong>, buka akses tautannya (Public), dan tempel tautannya di bawah.</p>
+                                      <form onSubmit={handleUploadTask} className="bg-purple-50 dark:bg-slate-800 border-2 border-dashed border-purple-300 dark:border-purple-700 rounded-2xl p-6 sm:p-8 text-center hover:bg-purple-100/50 dark:hover:bg-slate-700 transition-colors">                                         <UploadCloud size={48} className="text-purple-500 mx-auto mb-4" />
+                                        <h4 className="font-bold text-xl text-purple-900 dark:text-purple-100 mb-2">Kirim Tautan Tugas</h4>
+                                        <p className="text-sm text-purple-700/80 dark:text-purple-300 mb-6 max-w-md mx-auto">Untuk kelancaran sistem, mohon upload file tugas Anda ke <strong className="dark:text-purple-100">Google Drive</strong>, buka akses tautannya (Public), dan tempel tautannya di bawah.</p>
                                          <input type="url" required placeholder="Paste link Google Drive di sini..." value={taskUrlInput} onChange={e => setTaskUrlInput(e.target.value)} className="w-full max-w-lg mx-auto px-4 py-3 rounded-xl border border-purple-200 bg-white focus:ring-2 focus:ring-purple-500 text-sm mb-4 block" />
                                          <Button type="submit" disabled={isUploadingTask || !taskUrlInput.trim()} className="w-full sm:max-w-xs mx-auto bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/30 border-none">
                                             {isUploadingTask ? 'Mengirim...' : 'Kirim Tugas'}
