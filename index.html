@@ -1172,7 +1172,7 @@
 
       const handleSavePengumuman = async () => {
          setIsSaving(true);
-         try { await setDoc(doc(db, "rba_lms", "main_db"), { pengumuman: promoText }, { merge: true }); }
+         try { await setDoc(doc(db, "rba_lms", "main_db"), { pengumuman: promoText }, { merge: true });
          alert("✅ Pengumuman berhasil diperbarui!"); }
          catch (e) { console.error("Gagal simpan pengumuman", e); }
          setIsSaving(false);
