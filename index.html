@@ -3879,7 +3879,7 @@ const compressImage = (file) => {
 
       const [courses, setCourses] = useState(() => {
           const local = getSafeLocal('rba_courses', []);
-          return local.length > 0 ? local : defaultDemoCourses;
+          return local.length > 0 ? local : [];
       });
       const [enrollments, setEnrollments] = useState(() => getSafeLocal('rba_enrollments', {}));
       const [usersData, setUsersData] = useState(() => getSafeLocal('rba_users', defaultUsers));
