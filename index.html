@@ -1172,7 +1172,8 @@
 
       const handleSavePengumuman = async () => {
          setIsSaving(true);
-         try { await setDoc(doc(db, "rba_lms", "main_db"), { pengumuman: promoText }, { merge: true }); } 
+         try { await setDoc(doc(db, "rba_lms", "main_db"), { pengumuman: promoText }, { merge: true }); }
+        alert("✅ Pengumuman berhasil diperbarui!"); // <--- SUNTIKAN DI SINI
          catch (e) { console.error("Gagal simpan pengumuman", e); }
          setIsSaving(false);
       };
@@ -1886,6 +1887,7 @@
          const updatedUsers = { ...usersData, [safeToken]: { role: newRole, name: newNama, used: false, createdAt: Date.now() } };
          try {
             await setDoc(doc(dbInstance, "rba_lms", "main_db"), { users: updatedUsers }, { merge: true });
+           alert("✅ Token santri baru berhasil dibuat!"); // <--- SUNTIKAN DI SINI
             setShowAddModal(false); setNewToken(''); setNewNama(''); setNewRole('siswa');
          } catch(e) { setErrorMsg('Gagal menyimpan.'); }
          setIsSubmitting(false);
@@ -2399,6 +2401,7 @@
              const existingIdx = updatedCourses.findIndex(c => c.id === formData.id);
              if (existingIdx >= 0) { updatedCourses[existingIdx] = formData; } else { updatedCourses.push(formData); }
              await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
+             alert("✅ Alhamdulillah, Program berhasil disimpan!"); // <--- SUNTIKAN DI SINI
              setView('list');
          } catch(error) {}
          setIsSubmitting(false);
@@ -2415,6 +2418,7 @@
                  if (modulForm.id) { const mIdx = existingModules.findIndex(m => m.id === modulForm.id); if (mIdx >= 0) existingModules[mIdx] = newModul; } else { existingModules.push(newModul); }
                  updatedCourses[courseIdx].modules = existingModules;
                  await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
+                 alert("✅ Alhamdulillah, Materi/Modul berhasil ditambahkan!"); // <--- SUNTIKAN DI SINI
                  setActiveCourse(updatedCourses[courseIdx]);
                  setIsModulFormOpen(false); setModulForm({ id: '', title: '', desc: '', type: 'youtube', url: '', questions: [] }); setUploadMsg('');
              }
