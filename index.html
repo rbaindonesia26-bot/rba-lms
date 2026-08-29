@@ -1174,7 +1174,8 @@
          setIsSaving(true);
          try { await setDoc(doc(db, "rba_lms", "main_db"), { pengumuman: promoText }, { merge: true }); }
         alert("✅ Pengumuman berhasil diperbarui!"); // <--- SUNTIKAN DI SINI
-         catch (e) { console.error("Gagal simpan pengumuman", e); }
+      } catch (e) {
+         console.error("Gagal simpan pengumuman", e); }
          setIsSaving(false);
       };
 
