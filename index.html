@@ -2403,8 +2403,8 @@
              await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
              alert("✅ Alhamdulillah, Program berhasil disimpan!"); // <--- SUNTIKAN DI SINI
              setView('list');
-         } catch(error) {}
-         setIsSubmitting(false);
+        } catch(error) { alert("GAGAL MENYIMPAN PROGRAM: " + error.message); }
+        setIsSubmitting(false);
       };
 
       const handleSaveModul = async (e) => {
@@ -2422,8 +2422,8 @@
                  setActiveCourse(updatedCourses[courseIdx]);
                  setIsModulFormOpen(false); setModulForm({ id: '', title: '', desc: '', type: 'youtube', url: '', questions: [] }); setUploadMsg('');
              }
-         } catch(error) {}
-         setIsSubmitting(false);
+        } catch(error) { alert("GAGAL MENYIMPAN MATERI: " + error.message); }
+        setIsSubmitting(false);
       };
 
       const handleDeleteModul = async () => {
@@ -2438,8 +2438,8 @@
                  setActiveCourse(updatedCourses[courseIdx]);
                  setModulToDelete(null);
              }
-         } catch(error) {}
-         setIsSubmitting(false);
+        } catch(error) { alert("GAGAL MENGHAPUS MATERI: " + error.message); }
+        setIsSubmitting(false);
       };
 
       if (view === 'form') {
@@ -2970,7 +2970,7 @@
               const docRef = doc(db, "rba_lms", `diskusi_${program.id}_${activeModul.id}`);
               await setDoc(docRef, { comments: [...discussions, newComment] }, { merge: true });
               setComment(''); 
-          } catch(error) {}
+          } catch(error) { alert("Gagal mengirim komentar: " + error.message); }
       };
 
 const handleQuizSubmit = async () => {
