@@ -3186,31 +3186,59 @@ const handleQuizSubmit = async () => {
                              </div>
                          </div>
 
-                         {!isPengajarTugas ? (
+                        {!isPengajarTugas ? (
                              <div className="space-y-6 animate-fade-in">
                                  {mySubmission ? (
                                     <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
-                                        <CheckCircle size={48} className="text-emerald-500 mx-auto mb-3" />
-                                         <h4 className="font-bold text-lg mb-2">Tugas Berhasil Terkirim</h4>
-                                         <a href={mySubmission.url} target="_blank" className="inline-flex items-center gap-2 text-blue-600 hover:underline mb-6 bg-blue-50 px-4 py-2 rounded-lg font-bold"><Link2 size={18}/> Buka Link Tugas Saya</a><br/>
-                                         <div className={`inline-block px-4 py-2 rounded-xl font-bold border ${mySubmission.score !== null ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>
-                                             {mySubmission.score !== null ? `⭐ Nilai Anda: ${mySubmission.score}/100` : '⏳ Sedang Menunggu Penilaian Ustadz...'}
-                                         </div>
-                                     </div>
+                                        {/* Ubah Ikon Berdasarkan Status Kelulusan */}
+                                        {mySubmission.score >= 100 ? (
+                                            <CheckCircle size={48} className="text-emerald-500 mx-auto mb-3" />
+                                        ) : mySubmission.score !== null ? (
+                                            <AlertTriangle size={48} className="text-amber-500 mx-auto mb-3" />
+                                        ) : (
+                                            <Clock size={48} className="text-blue-500 mx-auto mb-3" />
+                                        )}
+                                        
+                                        <h4 className="font-bold text-lg mb-2">
+                                            {mySubmission.score === null ? 'Tugas Berhasil Terkirim' : (mySubmission.score >= 100 ? 'Alhamdulillah, Lulus Sempurna!' : 'Tugas Perlu Diperbaiki')}
+                                        </h4>
+                                        
+                                        <a href={mySubmission.url} target="_blank" className="inline-flex items-center gap-2 text-blue-600 hover:underline mb-6 bg-blue-50 px-4 py-2 rounded-lg font-bold"><Link2 size={18}/> Buka Link Tugas Saya</a><br/>
+                                        
+                                        <div className={`inline-block px-4 py-2 rounded-xl font-bold border ${mySubmission.score >= 100 ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : (mySubmission.score !== null ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-amber-100 text-amber-700 border-amber-200')}`}>
+                                            {mySubmission.score !== null ? `⭐ Nilai Anda: ${mySubmission.score}/100` : '⏳ Sedang Menunggu Penilaian Ustadz...'}
+                                        </div>
+
+                                        {/* FORM PERBAIKAN: Muncul Otomatis Jika Nilai di Bawah 100 */}
+                                        {mySubmission.score !== null && mySubmission.score < 100 && (
+                                            <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                                                <h5 className="font-bold text-slate-800 dark:text-white mb-2">Kirim Ulang Tugas Perbaikan</h5>
+                                                <p className="text-sm text-slate-500 mb-4">Tempelkan link Google Drive terbaru Anda di bawah ini untuk dinilai kembali oleh Ustadz.</p>
+                                                <form onSubmit={handleUploadTask} className="max-w-lg mx-auto">
+                                                    <input type="url" required placeholder="Paste link Google Drive perbaikan di sini..." value={taskUrlInput} onChange={e => setTaskUrlInput(e.target.value)} className="w-full mb-3 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:bg-slate-800 dark:text-white dark:border-slate-600 dark:focus:ring-purple-400" />
+                                                    <Button type="submit" disabled={isUploadingTask || !taskUrlInput.trim()} className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/30 border-none">
+                                                        {isUploadingTask ? 'Mengirim Ulang...' : 'Kirim Perbaikan Tugas'}
+                                                    </Button>
+                                                    {uploadTaskMsg && <p className={`mt-3 text-sm font-bold ${uploadTaskMsg.includes('Gagal') ? 'text-rose-600' : 'text-emerald-600'}`}>{uploadTaskMsg}</p>}
+                                                </form>
+                                            </div>
+                                        )}
+                                    </div>
                                  ) : (
-                                      <form onSubmit={handleUploadTask} className="bg-purple-50 dark:bg-slate-800 border-2 border-dashed border-purple-300 dark:border-purple-700 rounded-2xl p-6 sm:p-8 text-center hover:bg-purple-100/50 dark:hover:bg-slate-700 transition-colors">                                         <UploadCloud size={48} className="text-purple-500 mx-auto mb-4" />
-                                        <h4 className="font-bold text-xl text-purple-900 dark:text-purple-100 mb-2">Kirim Tautan Tugas</h4>
-                                        <p className="text-sm text-purple-700/80 dark:text-purple-300 mb-6 max-w-md mx-auto">Untuk kelancaran sistem, mohon upload file tugas Anda ke <strong className="dark:text-purple-100">Google Drive</strong>, buka akses tautannya (Public), dan tempel tautannya di bawah.</p>
-                                        <input type="url" required placeholder="Paste link Google Drive di sini..." value={taskUrlInput} onChange={e => setTaskUrlInput(e.target.value)} className="w-full sm:max-w-lg mx-auto block px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:bg-slate-800 dark:text-white dark:border-slate-600 dark:focus:ring-purple-400" />                                       
-                                        <Button type="submit" disabled={isUploadingTask || !taskUrlInput.trim()} className="w-full sm:max-w-xs mx-auto bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/30 border-none">
-                                            {isUploadingTask ? 'Mengirim...' : 'Kirim Tugas'}
+                                     <form onSubmit={handleUploadTask} className="bg-purple-50 dark:bg-slate-800 border-2 border-dashed border-purple-300 dark:border-purple-700 rounded-2xl p-6 sm:p-8 text-center hover:bg-purple-100/50 dark:hover:bg-slate-700 transition-colors">
+                                         <UploadCloud size={48} className="text-purple-500 mx-auto mb-4" />
+                                         <h4 className="font-bold text-xl text-purple-900 dark:text-purple-100 mb-2">Kirim Tautan Tugas</h4>
+                                         <p className="text-sm text-purple-700/80 dark:text-purple-300 mb-6 max-w-md mx-auto">Untuk kelancaran sistem, mohon upload file tugas Anda ke <strong className="dark:text-purple-100">Google Drive</strong>, buka akses tautannya (Public), dan tempel tautannya di bawah.</p>
+                                         <input type="url" required placeholder="Paste link Google Drive di sini..." value={taskUrlInput} onChange={e => setTaskUrlInput(e.target.value)} className="w-full sm:max-w-lg mx-auto block px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:bg-slate-800 dark:text-white dark:border-slate-600 dark:focus:ring-purple-400" />
+                                         <Button type="submit" disabled={isUploadingTask || !taskUrlInput.trim()} className="w-full sm:max-w-xs mx-auto mt-4 bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/30 border-none">
+                                             {isUploadingTask ? 'Mengirim...' : 'Kirim Tugas'}
                                          </Button>
                                          {uploadTaskMsg && <p className={`mt-4 text-sm font-bold ${uploadTaskMsg.includes('Gagal') ? 'text-rose-600' : 'text-emerald-600'}`}>{uploadTaskMsg}</p>}
                                      </form>
                                  )}
                              </div>
                          ) : (
-                             <div className="space-y-4 animate-fade-in">
+                               <div className="space-y-4 animate-fade-in">
                                  <h4 className="font-bold text-lg mb-4 border-b border-slate-100 pb-2">Daftar Setoran Santri</h4>
                                  {Object.keys(taskSubmissions).length === 0 ? (
                                      <div className="text-center text-slate-500 py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
