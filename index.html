@@ -2500,20 +2500,55 @@
                   {modules.map((m, i) => {
                       const Meta = getModulMeta(m.type); const Icon = Meta.icon;
                       return (
-                      <Card key={m.id} className="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:shadow-md">
-                          <div className="flex items-center gap-4">
-                             <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-500 shrink-0">{i + 1}</div>
-                             <div>
-                                 <h3 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">{m.title}</h3>
-                                 <Badge variant="slate" className="!text-[9px] sm:!text-[10px] mt-1"><Icon size={12} className={`mr-1 ${Meta.color}`}/> {Meta.label}</Badge>
-                             </div>
-                          </div>
-                          <div className="flex gap-2">
-                              <button onClick={() => { setModulForm(m); setIsModulFormOpen(true); }} className="p-2 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded-lg"><PenTool size={16}/></button>
-                              <button onClick={() => setModulToDelete(m.id)} className="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-lg"><Trash2 size={16}/></button>
-                          </div>
-                      </Card>
-                  )})}
+                  <Card key={m.id} 
+                  draggable="true"
+                  onDragStart={(e) => { e.dataTransfer.setData('dragIdx', i); e.currentTarget.style.opacity = '0.4'; }}
+                  onDragEnd={(e) => { e.currentTarget.style.opacity = '1'; }}
+                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.border = '2px dashed #3b82f6'; }}
+                  onDragLeave={(e) => { e.currentTarget.style.border = 'none'; }}
+                  onDrop={async (e) => {
+                      e.preventDefault();
+                      e.currentTarget.style.border = 'none';
+                      // 1. Ambil nomor urut asal dan tujuan
+                      const dragIdx = parseInt(e.dataTransfer.getData('dragIdx'), 10);
+                      if (dragIdx === i || isNaN(dragIdx)) return;
+                      
+                      // 2. Potong dan pindahkan data di dalam array
+                      const newModules = [...modules];
+                      const [movedItem] = newModules.splice(dragIdx, 1);
+                      newModules.splice(i, 0, movedItem);
+                      
+                      // 3. Perbarui tampilan layar secara instan
+                      const updatedCourse = { ...activeCourse, modules: newModules };
+                      setActiveCourse(updatedCourse); 
+                      
+                      // 4. Simpan urutan baru ke Firebase secara diam-diam (Background)
+                      try {
+                          await setDoc(doc(db, "db_courses", activeCourse.id), updatedCourse, { merge: true });
+                      } catch (err) {
+                          alert("Gagal menyimpan urutan baru ke database: " + err.message);
+                      }
+                  }}
+                  className="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:shadow-md cursor-grab active:cursor-grabbing transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+            >
+                <div className="flex items-center gap-4 pointer-events-none">
+                    {/* Lingkaran Angka sekarang bertindak sebagai indikator bisa ditarik */}
+                    <div title="Tahan dan geser untuk mengurutkan" className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-500 shrink-0 border-2 border-transparent transition-all shadow-sm">
+                        {i + 1}
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">{m.title}</h3>
+                        <Badge variant="slate" className="!text-[9px] sm:!text-[10px] mt-1"><Icon size={12} className={Meta.color}/> {Meta.label}</Badge>
+                    </div>
+                </div>
+                
+                {/* Tombol Edit & Hapus */}
+                <div className="flex gap-2">
+                    <button onClick={() => { setModulForm(m); setIsModulFormOpen(true); }} className="p-2 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded-lg"><PenTool size={16}/></button>
+                    <button onClick={() => setModulToDelete(m.id)} className="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-lg"><Trash2 size={16}/></button>
+                </div>
+            </Card>
+                      )})}
                </div>
 
                {isModulFormOpen && (
