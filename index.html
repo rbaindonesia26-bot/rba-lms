@@ -2535,7 +2535,18 @@
                                       <option value="tugas">Tugas Praktik (Upload)</option>
                                   </select>
                               </div>
-                              
+                            {/* SAKLAR SEKAT (Khusus Pemisah Bab) */}
+    {modulForm.type === 'pemisah' && (
+        <div className="bg-amber-50 dark:bg-amber-900/30 p-4 mb-4 rounded-xl border border-amber-200 dark:border-amber-700 animate-fade-in">
+            <label className="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" checked={modulForm.isGateLocked || false} onChange={e => setModulForm({...modulForm, isGateLocked: e.target.checked})} className="mt-1 w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500 cursor-pointer" />
+                <div>
+                    <span className="block text-sm font-bold text-amber-900 dark:text-amber-400">Jadikan Sekat Penahan (Kunci Akses)</span>
+                    <span className="block text-xs text-amber-700 dark:text-amber-500 mt-1">Jika dicentang, santri tidak akan bisa menekan tombol selesai pada tahap ini, sehingga materi di bawahnya akan tertahan/terkunci sampai Anda menghilangkan centang ini.</span>
+                </div>
+            </label>
+        </div>
+    )}  
                               {(modulForm.type !== 'kuis' && modulForm.type !== 'tugas' && modulForm.type !== 'pemisah') && (
                                   <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                                       <label className="block text-sm font-bold mb-2">Sumber (URL / Berkas)</label>
@@ -3315,10 +3326,16 @@ const handleQuizSubmit = async () => {
                                        <Button size="md" className={`w-full sm:w-auto text-white border-none transition-all ${canMarkComplete ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`} onClick={() => canMarkComplete ? onMarkComplete(program.id, activeModul.id) : null} disabled={!canMarkComplete}>
                                            {canMarkComplete ? <><Check size={18} className="mr-2"/> Tandai Selesai</> : <><Lock size={18} className="mr-2"/> {lockMessage}</>}
                                        </Button>
-                                   ) : (
-                                       <Button size="md" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white border-none shadow-blue-500/30" onClick={() => onMarkComplete(program.id, activeModul.id)}>
-                                           <Check size={18} className="mr-2"/> Tandai Selesai
-                                       </Button>
+                                  ) : (
+                                       (activeModul.type === 'pemisah' && activeModul.isGateLocked) ? (
+                                           <Button size="md" className="w-full sm:w-auto bg-slate-200 text-slate-500 cursor-not-allowed shadow-none border-none" disabled>
+                                               <Lock size={18} className="mr-2"/> Menunggu Sesi Dibuka
+                                           </Button>
+                                       ) : (
+                                           <Button size="md" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white border-none shadow-blue-500/30" onClick={() => onMarkComplete(program.id, activeModul.id)}>
+                                               <Check size={18} className="mr-2"/> Tandai Selesai
+                                           </Button>
+                                       )
                                    )
                                  )
                                )}
