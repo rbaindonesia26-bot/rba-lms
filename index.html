@@ -3398,8 +3398,12 @@ const handleQuizSubmit = async () => {
 
                          {/* Body: Deskripsi Materi (Full Width 100%) */}
                          <div className="bg-blue-50 dark:bg-slate-800 border-l-4 border-blue-500 p-4 sm:p-5 rounded-r-lg shadow-sm overflow-hidden w-full">
-                            <div className="text-blue-900 dark:text-blue-100 font-medium text-base sm:text-lg leading-relaxed flex flex-col gap-2">
-                                {activeModul.desc ? activeModul.desc.split('\n').map((line, idx) => (
+                          <div 
+                                className="text-blue-900 dark:text-blue-100 font-medium text-base sm:text-lg leading-relaxed flex flex-col gap-2 select-none"
+                                onCopy={(e) => e.preventDefault()}
+                                onContextMenu={(e) => e.preventDefault()}
+                            >
+                                  {activeModul.desc ? activeModul.desc.split('\n').map((line, idx) => (
                                     <div key={idx} dir="auto" className="min-h-[1.5rem] break-words">{line}</div>
                                 )) : null}
                             </div>
