@@ -2469,6 +2469,19 @@
                         </select>
                      </div>
                   </div>
+                 {/* SAKLAR MODE BEBAS AKSES */}
+                            <label className="flex items-start gap-3 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl border border-indigo-200 dark:border-indigo-700 cursor-pointer mb-6">
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.isFreeAccess || false} 
+                                    onChange={e => setFormData({...formData, isFreeAccess: e.target.checked})} 
+                                    className="mt-1 w-5 h-5 text-indigo-600 rounded border-indigo-300 focus:ring-indigo-500 cursor-pointer shrink-0" 
+                                />
+                                <div>
+                                    <span className="block text-sm font-bold text-indigo-900 dark:text-indigo-400">Bebaskan Urutan Akses (Mode Bebas)</span>
+                                    <span className="block text-xs text-indigo-700 dark:text-indigo-500 mt-1">Jika dicentang, santri dapat mengakses materi secara acak tanpa harus berurutan. (Sekat Penahan / Pembatas Bab tetap akan mengunci materi di bawahnya).</span>
+                                </div>
+                            </label>
 <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
     <label className="block text-sm font-bold mb-2">Gambar Sampul (Opsional)</label>
     <input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'coverUrl')} disabled={isUploading} className="mb-3 w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-800 dark:file:text-slate-300" />
@@ -3428,11 +3441,18 @@ const handleQuizSubmit = async () => {
                          const isActive = activeModul && activeModul.id === modul.id;
                          const isModulCompleted = (userProgress || []).includes(modul.id);
                          
-                         // LOGIKA BARU: Cek apakah modul terkunci (Berurutan)
-                         const isPengajarProg = role === 'admin' || role === 'guru';
-                         // Modul terkunci jika: Bukan pengajar, bukan modul pertama, dan modul SEBELUMNYA belum selesai
-                         const isLocked = !isPengajarProg && index > 0 && !(userProgress || []).includes(modules[index - 1].id);
-
+                // LOGIKA BARU: Mode Berurutan vs Mode Bebas & Sekat Penahan
+                const isPengajarProg = role === 'admin' || role === 'guru';
+                
+                // 1. Cek apakah ada Sekat Penahan di atas modul ini yang BELUM diselesaikan santri
+                const hasUncompletedGate = modules.slice(0, index).some(m => m.type === 'pemisah' && m.isGateLocked && !(userProgress || []).includes(m.id));
+                
+                // 2. Kunci modul jika: Bukan pengajar, DAN (terhalang sekat ATAU (mode berurutan aktif & modul atasnya belum selesai))
+                const isLocked = !isPengajarProg && (
+                    hasUncompletedGate || 
+                    (!program.isFreeAccess && index > 0 && !(userProgress || []).includes(modules[index - 1].id))
+                );
+           
                          return (
                          <div key={modul.id} onClick={() => { if(!isLocked) setActiveModul(modul); }} className={`p-4 border-b border-slate-100 flex items-center gap-4 transition-colors relative z-10 bg-white ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'} ${isActive && !isLocked ? 'bg-blue-50' : ''}`}>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs border-2 z-10 bg-white transition-colors ${isLocked ? 'border-slate-300 bg-slate-100' : (isModulCompleted ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : (isActive ? 'border-blue-600 text-blue-600' : 'border-slate-300 text-slate-400'))}`}>
