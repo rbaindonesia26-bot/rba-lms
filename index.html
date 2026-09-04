@@ -2969,9 +2969,9 @@
     onCopy={(e) => e.preventDefault()}
     onContextMenu={(e) => e.preventDefault()}
 >
-    {program.desc ? program.desc.split('\n').map((line, idx) => (
-        <div key={idx} dir="auto" className="min-h-[1.5rem] break-words">{line}</div>
-    )) : null}
+{program.desc ? program.desc.split('\n').map((line, idx) => (
+    <div key={idx} dir="auto" className="min-h-[1.5rem] break-words" dangerouslySetInnerHTML={{ __html: line }} />
+)) : null}
 </div>
                   <div className="mt-auto pt-6 border-t border-slate-100 w-full">
                      {(role === 'admin' || role === 'guru') ? (
@@ -3410,10 +3410,10 @@ const handleQuizSubmit = async () => {
                                 onCopy={(e) => e.preventDefault()}
                                 onContextMenu={(e) => e.preventDefault()}
                             >
-                                  {activeModul.desc ? activeModul.desc.split('\n').map((line, idx) => (
-                                    <div key={idx} dir="auto" className="min-h-[1.5rem] break-words">{line}</div>
-                                )) : null}
-                            </div>
+                            {activeModul.desc ? activeModul.desc.split('\n').map((line, idx) => (
+                            <div key={idx} dir="auto" className="min-h-[1.5rem] break-words" dangerouslySetInnerHTML={{ __html: line }} />
+                            )) : null}
+                          </div>
                          </div>
                       </div>
                   )}
