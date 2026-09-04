@@ -2574,8 +2574,50 @@
                           <h3 className="text-2xl sm:text-3xl font-black mb-6">{modulForm.id ? 'Edit Tahapan' : 'Tambah Tahapan Baru'}</h3>
                           <form onSubmit={handleSaveModul} className="space-y-6">
                               <div><label className="block text-sm sm:text-base font-bold mb-2">Judul</label><input type="text" required value={modulForm.title || ''} onChange={e => setModulForm({...modulForm, title: e.target.value})} className="w-full px-4 py-3 sm:py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm sm:text-base" /></div>
-                                <div><label className="block text-sm sm:text-base font-bold mb-2">Deskripsi Materi</label><textarea required rows="8" dir="auto" value={modulForm.desc || ''} onChange={e => setModulForm({...modulForm, desc: e.target.value})} className="w-full px-4 py-3 sm:py-4 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm sm:text-base min-h-[180px] resize-y custom-scrollbar leading-relaxed"></textarea></div>                              
-                              <div>
+<div>
+    <label className="block text-sm sm:text-base font-bold mb-2">Deskripsi Materi</label>
+    
+    {/* Deretan Tombol Format Cepat */}
+    <div className="flex flex-wrap gap-2 mb-2 select-none">
+        {[
+            { label: 'B', start: '<b>', end: '</b>', style: 'font-bold px-3 py-1 border border-slate-300 rounded hover:bg-slate-200 dark:text-slate-800' },
+            { label: 'I', start: '<i>', end: '</i>', style: 'italic px-3 py-1 border border-slate-300 rounded hover:bg-slate-200 dark:text-slate-800' },
+            { label: 'U', start: '<u>', end: '</u>', style: 'underline px-3 py-1 border border-slate-300 rounded hover:bg-slate-200 dark:text-slate-800' },
+            { label: 'Hijau', start: '<span style="color:#16a34a">', end: '</span>', style: 'font-semibold px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200' },
+            { label: 'Merah', start: '<span style="color:#dc2626">', end: '</span>', style: 'font-semibold px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200' },
+            { label: 'Oranye', start: '<span style="color:#ea580c">', end: '</span>', style: 'font-semibold px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200' }
+        ].map(btn => (
+            <button
+                key={btn.label}
+                type="button"
+                className={btn.style}
+                onClick={() => {
+                    const textarea = document.getElementById('input-desc-materi');
+                    if (!textarea) return;
+                    const s = textarea.selectionStart;
+                    const e = textarea.selectionEnd;
+                    const txt = modulForm.desc || '';
+                    const selected = txt.substring(s, e);
+                    // Pasang tag HTML
+                    const newText = txt.substring(0, s) + btn.start + selected + btn.end + txt.substring(e);
+                    setModulForm({ ...modulForm, desc: newText });
+                    
+                    // Kembalikan kursor ke posisi semula
+                    setTimeout(() => { 
+                        textarea.focus(); 
+                        textarea.setSelectionRange(s + btn.start.length, e + btn.start.length); 
+                    }, 0);
+                }}
+            >
+                {btn.label}
+            </button>
+        ))}
+    </div>
+
+    {/* Kotak Textarea Utama yang sudah ditambahkan ID */}
+    <textarea id="input-desc-materi" required rows="8" dir="auto" value={modulForm.desc || ''} onChange={e => setModulForm({...modulForm, desc: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+</div>
+                            <div>
                                   <label className="block text-sm sm:text-base font-bold mb-2">Jenis Materi</label>
                                   <select value={modulForm.type} onChange={e => setModulForm({...modulForm, type: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm">
                                       <option value="youtube">Video YouTube</option>
