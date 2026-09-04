@@ -774,7 +774,7 @@
                 </div>
                 <div className="p-5 flex-1 flex flex-col">
                   <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-2 leading-tight">{item.title}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-5 line-clamp-2">{item.desc}</p>
+                  <div className="text-sm text-slate-500 mb-5 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.desc }} />
                   <div className="mt-auto">
                     <div className="text-blue-600 dark:text-blue-400 font-extrabold text-xl mb-3">
                       Rp {item.price ? parseInt(item.price).toLocaleString('id-ID') : '0'}
@@ -806,7 +806,7 @@
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
                 <h3 className="font-bold text-base text-slate-900 dark:text-white mb-2 line-clamp-2">{item.title}</h3>
-                <p className="text-xs text-slate-500 line-clamp-2 mb-4">{item.desc}</p>
+                <div className="text-sm text-slate-500 line-clamp-3 mb-4" dangerouslySetInnerHTML={{ __html: item.desc }} />
                 <Button size="sm" onClick={() => window.open(item.url, '_blank')} className="w-full mt-auto bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white dark:bg-emerald-900/30 dark:hover:bg-emerald-600">
                   Baca / Buka
                 </Button>
@@ -1416,7 +1416,7 @@
             {pengumuman && (
                 <div className="bg-gradient-to-r from-blue-600 to-[#06B6D4] rounded-2xl p-5 sm:p-6 text-white shadow-xl shadow-blue-500/10 flex flex-col sm:flex-row items-start gap-4 mb-6">
                     <div className="bg-white/20 p-3 rounded-xl shrink-0"><Megaphone size={28}/></div>
-                    <div><h3 className="font-bold text-lg mb-1">Pengumuman Terbaru</h3><p className="text-sm text-blue-50 leading-relaxed whitespace-pre-wrap">{pengumuman}</p></div>
+                    <div className="text-sm text-blue-50 leading-relaxed whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{ __html: pengumuman }} />
                 </div>
             )}
             <hr className="border-slate-200 dark:border-slate-800" />
