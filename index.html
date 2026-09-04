@@ -1228,8 +1228,48 @@
                      <p className="text-xs text-slate-500">Kirim info penting yang akan muncul di dashboard publik dan seluruh siswa.</p>
                  </div>
              </div>
-             <textarea rows="3" placeholder="Ketik pengumuman di sini..." value={promoText} onChange={(e) => setPromoText(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 focus:outline-none text-sm resize-none mb-3 transition-shadow"></textarea>
-             <div className="flex justify-end gap-2">
+<div>
+    {/* Deretan Tombol Format Cepat untuk Pengumuman */}
+    <div className="flex flex-wrap gap-2 mb-2 select-none">
+        {[
+            { label: 'B', start: '<b>', end: '</b>', style: 'font-bold px-3 py-1 border border-slate-300 rounded hover:bg-slate-200 dark:text-slate-800' },
+            { label: 'I', start: '<i>', end: '</i>', style: 'italic px-3 py-1 border border-slate-300 rounded hover:bg-slate-200 dark:text-slate-800' },
+            { label: 'U', start: '<u>', end: '</u>', style: 'underline px-3 py-1 border border-slate-300 rounded hover:bg-slate-200 dark:text-slate-800' },
+            { label: 'Hijau', start: '<span style="color:#16a34a">', end: '</span>', style: 'font-semibold px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200' },
+            { label: 'Merah', start: '<span style="color:#dc2626">', end: '</span>', style: 'font-semibold px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200' },
+            { label: 'Oranye', start: '<span style="color:#ea580c">', end: '</span>', style: 'font-semibold px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200' }
+        ].map(btn => (
+            <button
+                key={btn.label}
+                type="button"
+                className={btn.style}
+                onClick={() => {
+                    const textarea = document.getElementById('input-promo');
+                    if (!textarea) return;
+                    const s = textarea.selectionStart;
+                    const e = textarea.selectionEnd;
+                    const txt = promoText || '';
+                    const selected = txt.substring(s, e);
+                    // Pasang tag HTML
+                    const newText = txt.substring(0, s) + btn.start + selected + btn.end + txt.substring(e);
+                    setPromoText(newText);
+                    
+                    // Kembalikan kursor ke posisi semula
+                    setTimeout(() => { 
+                        textarea.focus(); 
+                        textarea.setSelectionRange(s + btn.start.length, e + btn.start.length); 
+                    }, 0);
+                }}
+            >
+                {btn.label}
+            </button>
+        ))}
+    </div>
+
+    {/* Kotak Textarea Pengumuman */}
+    <textarea id="input-promo" rows="3" placeholder="Ketik pengumuman di sini..." value={promoText} onChange={(e) => setPromoText(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-900 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+</div>
+            <div className="flex justify-end gap-2">
                  <Button size="sm" onClick={() => setPromoText('')} variant="ghost" className="text-slate-500">Bersihkan</Button>
                  <Button size="sm" onClick={handleSavePengumuman} disabled={isSaving} className="gap-2 border-none">
                      {isSaving ? <Loader2 className="animate-spin" size={16}/> : <Send size={16}/>} 
