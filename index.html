@@ -518,8 +518,8 @@
                             </div>
                             <div className="p-4 max-h-60 overflow-y-auto custom-scrollbar">
                                 {pengumuman ? (
-                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{pengumuman}</p>
-                                ) : (
+                                  <div className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{ __html: pengumuman }} />
+                                     ) : (
                                     <p className="text-sm text-slate-400 text-center italic">Belum ada pengumuman baru saat ini.</p>
                                 )}
                             </div>
