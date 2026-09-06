@@ -2630,11 +2630,49 @@ if (view === 'modules') {
                                        <Badge variant="slate" className="!text-[9px] sm:!text-[10px] mt-1"><Icon size={12} className={Meta.color}/> {Meta.label}</Badge>
                                    </div>
                                </div>
-                               <div className="flex gap-2">
-                                   <button onClick={() => { setModulForm(m); setIsModulFormOpen(true); }} className="p-2 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded-lg"><PenTool size={16}/></button>
-                                   <button onClick={() => setModulToDelete(m.id)} className="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-lg"><Trash2 size={16}/></button>
-                               </div>
-                           </Card>
+{/* Tombol Panah Geser, Edit & Hapus */}
+<div className="flex gap-2 items-center">
+    {/* Grup Tombol Panah Naik Turun */}
+    <div className="flex gap-1 mr-1 sm:mr-3 border-r border-slate-200 dark:border-slate-700 pr-2 sm:pr-4">
+        <button 
+            onClick={async (e) => {
+                e.stopPropagation();
+                if (i === 0) return;
+                const newModules = [...modules];
+                const temp = newModules[i]; newModules[i] = newModules[i - 1]; newModules[i - 1] = temp;
+                const updatedCourse = { ...activeCourse, modules: newModules };
+                setActiveCourse(updatedCourse);
+                try { let coursesData = [...courses]; const cIdx = coursesData.findIndex(c => c.id === activeCourse.id); if (cIdx >= 0) { coursesData[cIdx] = updatedCourse; await setDoc(doc(db, "rba_lms", "main_db"), { courses: coursesData }, { merge: true }); } } catch (err) {}
+            }} 
+            disabled={i === 0} 
+            className={`p-1.5 rounded-lg transition-colors ${i === 0 ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40'}`} 
+            title="Geser ke Atas"
+        >
+            <ChevronDown size={18} className="rotate-180" />
+        </button>
+        <button 
+            onClick={async (e) => {
+                e.stopPropagation();
+                if (i === modules.length - 1) return;
+                const newModules = [...modules];
+                const temp = newModules[i]; newModules[i] = newModules[i + 1]; newModules[i + 1] = temp;
+                const updatedCourse = { ...activeCourse, modules: newModules };
+                setActiveCourse(updatedCourse);
+                try { let coursesData = [...courses]; const cIdx = coursesData.findIndex(c => c.id === activeCourse.id); if (cIdx >= 0) { coursesData[cIdx] = updatedCourse; await setDoc(doc(db, "rba_lms", "main_db"), { courses: coursesData }, { merge: true }); } } catch (err) {}
+            }} 
+            disabled={i === modules.length - 1} 
+            className={`p-1.5 rounded-lg transition-colors ${i === modules.length - 1 ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40'}`} 
+            title="Geser ke Bawah"
+        >
+            <ChevronDown size={18} />
+        </button>
+    </div>
+
+    {/* Tombol Edit & Hapus Asli */}
+    <button onClick={() => { setModulForm(m); setIsModulFormOpen(true); }} className="p-2 text-blue-500 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-lg"><PenTool size={16}/></button>
+    <button onClick={() => setModulToDelete(m.id)} className="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 rounded-lg"><Trash2 size={16}/></button>
+</div>
+      </Card>
                        );
                    })}
                 </div>
