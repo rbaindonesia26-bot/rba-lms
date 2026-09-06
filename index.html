@@ -4948,11 +4948,40 @@ if (isAppInitializing) return (
                 </div>
               </div>
             </header>
-            <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-slate-50 dark:bg-[#0B1120]">{renderContent()}</div>
-          </main>
-        </div>
-        </ThemeContext.Provider>
-      );
+            <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-slate-50 dark:bg-[#0B1120] pb-24 md:pb-6">{renderContent()}</div>
+          </main>      
+          
+      {/* ========================================= */}
+      {/* BOTTOM NAVIGATION BAR (KHUSUS LAYAR HP)   */}
+      {/* ========================================= */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        
+        <button onClick={() => setActiveMenu('dashboard')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'dashboard' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+          <LayoutDashboard size={22} className={activeMenu === 'dashboard' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
+          <span className="text-[10px] mt-1.5 font-semibold">Beranda</span>
+        </button>
+        
+        <button onClick={() => setActiveMenu('katalog')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'katalog' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+          <BookOpen size={22} className={activeMenu === 'katalog' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
+          <span className="text-[10px] mt-1.5 font-semibold">Katalog</span>
+        </button>
+
+        <button onClick={() => setActiveMenu('perpustakaan')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'perpustakaan' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+          <Library size={22} className={activeMenu === 'perpustakaan' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
+          <span className="text-[10px] mt-1.5 font-semibold">Pustaka</span>
+        </button>
+
+        <button onClick={() => setActiveMenu('profil')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'profil' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+          <User size={22} className={activeMenu === 'profil' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
+          <span className="text-[10px] mt-1.5 font-semibold">Profil</span>
+        </button>
+
+      </div>
+      {/* ========================================= */}
+
+    </div>
+  </ThemeContext.Provider>
+);
     }
 
     const root = createRoot(document.getElementById('root'));
