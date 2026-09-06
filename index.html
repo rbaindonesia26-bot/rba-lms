@@ -4828,17 +4828,27 @@ if (isAppInitializing) return (
               <span className="text-[10px] mt-1.5 font-semibold text-center">Beranda</span>
             </button>
 
-            {/* KATALOG (Menggulir ke area tombol Daftar/Program di tengah halaman) */}
+            {/* KATALOG (Memicu tombol 'Lihat Program' atau bagian program di LandingPage) */}
             <button onClick={() => { 
-              window.scrollBy({ top: 400, behavior: 'smooth' }); 
+              const programBtn = Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes('Lihat Program') || el.textContent.includes('Program'));
+              if(programBtn) {
+                programBtn.click();
+              } else {
+                window.scrollBy({ top: 450, behavior: 'smooth' });
+              }
             }} className="flex flex-col items-center justify-center p-2 w-16 transition-colors text-slate-500 dark:text-slate-400">
               <BookOpen size={22} />
               <span className="text-[10px] mt-1.5 font-semibold text-center">Katalog</span>
             </button>
 
-            {/* PUSTAKA (Menggulir lebih jauh ke bawah halaman publik) */}
+            {/* PUSTAKA (Memicu tombol navigasi perpustakaan/modul publik jika ada) */}
             <button onClick={() => { 
-              window.scrollBy({ top: 800, behavior: 'smooth' }); 
+              const libraryBtn = Array.from(document.querySelectorAll('button, a')).find(el => el.textContent.includes('Pustaka') || el.textContent.includes('Perpustakaan') || el.textContent.includes('Modul'));
+              if(libraryBtn) {
+                libraryBtn.click();
+              } else {
+                window.scrollBy({ top: 900, behavior: 'smooth' });
+              }
             }} className="flex flex-col items-center justify-center p-2 w-16 transition-colors text-slate-500 dark:text-slate-400">
               <Library size={22} />
               <span className="text-[10px] mt-1.5 font-semibold text-center">Pustaka</span>
