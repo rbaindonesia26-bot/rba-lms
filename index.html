@@ -4817,6 +4817,9 @@ if (isAppInitializing) return (
         <ThemeContext.Provider value="admin">
            <InstallPrompt />
            <LandingPage onLogin={handleLoginSuccess} usersData={usersData} isDbReady={firebaseStatus !== 'connecting'} coursesData={courses} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} lang={lang} setLang={setLang} pengumuman={pengumuman} libraryData={libraryData} />
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[999999] bg-red-600 text-white text-center p-4 font-bold text-lg shadow-2xl">
+          TEST MENU BAWAH MUNCUL ATAU TIDAK?
+        </div>
         </ThemeContext.Provider>
       );
 
