@@ -4956,7 +4956,7 @@ if (isAppInitializing) return (
       {/* ========================================= */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         
-        {/* 1. MENU KHUSUS ADMIN */}
+        {/* JIKA ADMIN */}
         {role === 'admin' ? (
           <>
             <button onClick={() => setActiveMenu('validasi-pendaftaran')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'validasi-pendaftaran' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
@@ -4977,7 +4977,7 @@ if (isAppInitializing) return (
             </button>
           </>
         ) : role === 'guru' ? (
-        /* 2. MENU KHUSUS GURU */
+        /* JIKA GURU */
           <>
             <button onClick={() => setActiveMenu('manajemen-program')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'manajemen-program' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
               <FolderOpen size={22} className={activeMenu === 'manajemen-program' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
@@ -4997,7 +4997,7 @@ if (isAppInitializing) return (
             </button>
           </>
         ) : role === 'siswa' ? (
-        /* 3. MENU KHUSUS SISWA */
+        /* JIKA SISWA */
           <>
             <button onClick={() => setActiveMenu('dashboard')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'dashboard' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
               <LayoutDashboard size={22} className={activeMenu === 'dashboard' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
@@ -5017,7 +5017,7 @@ if (isAppInitializing) return (
             </button>
           </>
         ) : (
-        /* 4. MENU TAMU / DEFAULT (JIKA BELUM LOGIN / KONDISI LAIN) */
+        /* DEFAULT / TAMU (OTOMATIS MUNCUL JIKA TIDAK MASUK KATEGORI DI ATAS) */
           <>
             <button onClick={() => setActiveMenu('dashboard')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'dashboard' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
               <LayoutDashboard size={22} className={activeMenu === 'dashboard' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
