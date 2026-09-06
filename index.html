@@ -5027,8 +5027,8 @@ if (isAppInitializing) return (
         )}
 
   {/* JIKA ADMIN */}
-        {role === 'admin' && isLoggedIn && (
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        {role === 'admin' && isLoggedIn && !isSidebarOpen && (
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
             <div className="flex justify-around items-center w-full">
               <button onClick={() => setActiveMenu('validasi-pendaftaran')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'validasi-pendaftaran' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
                 <BookOpen size={22} className={activeMenu === 'validasi-pendaftaran' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
@@ -5042,7 +5042,7 @@ if (isAppInitializing) return (
                 <LayoutDashboard size={22} className={activeMenu === 'persetujuan' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
                 <span className="text-[10px] mt-1.5 font-semibold text-center">Setuju</span>
               </button>
-                <button onClick={() => setActiveMenu('manajemen-pengguna')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'manajemen-pengguna' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
+              <button onClick={() => setActiveMenu('manajemen-pengguna')} className={`flex flex-col items-center justify-center p-2 w-16 transition-colors ${activeMenu === 'manajemen-pengguna' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-500 dark:text-slate-400'}`}>
                 <User size={22} className={activeMenu === 'manajemen-pengguna' ? 'fill-emerald-100 dark:fill-emerald-900/30' : ''} />
                 <span className="text-[10px] mt-1.5 font-semibold text-center">Pengguna</span>
               </button>
