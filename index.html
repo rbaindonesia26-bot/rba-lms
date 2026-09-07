@@ -3185,13 +3185,27 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
                 ) : (
                     <div className="flex gap-3 items-center">
                         {/* Jika siswa/guru biasa melihat program pusat, tampilkan tombol belajar biasa jika disetujui */}
-                        <div className="flex gap-3 w-full">
-                            {enrollmentStatus === 'approved' && <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-none" onClick={onGoToClass}><MonitorPlay size={18} className="mr-2"/> Lanjut Belajar</Button>}
-                            {enrollmentStatus === 'pending' && <Button className="bg-amber-500 text-white border-none opacity-80 cursor-not-allowed"><Clock size={18} className="mr-2"/> Menunggu Konfirmasi</Button>}
-                            {!enrollmentStatus && <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none" onClick={() => onEnroll(program.id)}><PlusCircle size={18} className="mr-2"/> Minta Akses Kelas</Button>}
-                        </div>
-                          </div>
-                        )}
+{/* JIKA SISWA/GURU BIASA MELIHAT PROGRAM */}
+<div className="flex gap-3 w-full">
+  {enrollmentStatus === 'approved' && (
+    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-none" onClick={onGoToClass}>
+      <MonitorPlay size={18}/> Masuk Kelas
+    </Button>
+  )}
+  
+  {enrollmentStatus === 'pending' && (
+    <Button disabled className="bg-amber-500 text-white border-none opacity-100 cursor-not-allowed">
+      <Clock size={18}/> Menunggu Persetujuan Admin
+    </Button>
+  )}
+  
+  {!enrollmentStatus && (
+    <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none" onClick={() => onEnroll(program.id)}>
+      <PlusCircle size={18}/> Minta Akses Kelas
+    </Button>
+  )}
+</div>
+)}
                     </div>
                 </div>
             </div>
