@@ -3172,9 +3172,9 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
 )) : null}
 </div>
                   <div className="mt-auto pt-6 border-t border-slate-100 w-full">
-{/* Gembok Tombol Interaksi & Kelola di Detail Program */}
-                {(role === 'admin' || (program.creator_id && program.creator_id === uid)) ? (
-                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                {/* Gembok Tombol Interaksi & Kelola di Detail Program */}
+                  {(role === 'admin' || (program.creator_id && program.creator_id === uid)) ? (
+                      <div className="flex flex-col sm:flex-row gap-3 w-full">
                         <Button onClick={onGoToClass}>
                             <MessageCircle size={18} className="mr-2"/> Masuk Kelas & Balas Diskusi
                         </Button>
@@ -3183,33 +3183,27 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
                         </Button>
                     </div>
                 ) : (
-                    /* Jika siswa/guru biasa melihat program pusat, tampilkan tombol belajar biasa jika disetujui */
-                    <div className="flex gap-3 w-full">
-                      {enrollmentStatus === 'approved' && (
-                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-none" onClick={onGoToClass}>
-                          <MonitorPlay size={18}/> Masuk Kelas
-                        </Button>
-                      )}
-                      
-                      {enrollmentStatus === 'pending' && (
-                        <Button disabled className="bg-amber-500 text-white border-none opacity-100 cursor-not-allowed">
-                          <Clock size={18}/> Menunggu Persetujuan Admin
-                        </Button>
-                      )}
-                      
-                      {!enrollmentStatus && (
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none" onClick={() => onEnroll(program.id)}>
-                          <PlusCircle size={18}/> Minta Akses Kelas
-                        </Button>
-                      )}
+                    <div className="flex gap-3 items-center">
+                        {/* Jika siswa/guru biasa melihat program pusat, tampilkan tombol belajar biasa jika disetujui */}
+                        <div className="flex gap-3 w-full">
+                            {enrollmentStatus === 'approved' && <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-none" onClick={onGoToClass}><MonitorPlay size={18} className="mr-2"/> Lanjut Belajar</Button>}
+                            {enrollmentStatus === 'pending' && <Button className="bg-amber-500 text-white border-none opacity-80 cursor-not-allowed"><Clock size={18} className="mr-2"/> Menunggu Konfirmasi</Button>}
+                            {!enrollmentStatus && <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none" onClick={() => onEnroll(program.id)}><PlusCircle size={18} className="mr-2"/> Minta Akses Kelas</Button>}
+                        </div>
+                          </div>
+                        )}
                     </div>
-                )}
+                </div>
+            </div>
+         </div>
+      );
     };
 
     const RuangKelas = ({ program, onBack, userProgress = [], onMarkComplete, role, userName, db, uid, storage, enrollments }) => {
       const modules = program?.modules || [];
       const [activeModul, setActiveModul] = useState(null);
-                    const [comment, setComment] = useState('');
+      
+      const [comment, setComment] = useState('');
       const [discussions, setDiscussions] = useState([]);
       const [quizAnswers, setQuizAnswers] = useState({});
       const [quizScore, setQuizScore] = useState(null);
