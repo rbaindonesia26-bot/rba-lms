@@ -2291,17 +2291,22 @@
       const handleEdit = (course) => { setFormData(course); setUploadMsg(''); setView('form'); };
       const openModules = (course) => { setActiveCourse(course); setView('modules'); };
 
-      const handleDeleteCourse = async () => {
-          if (!courseToDelete) return;
-          setIsSubmitting(true);
-          try {
-              const updatedCourses = courses.filter(c => c.id !== courseToDelete);
-              await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
-              setCourseToDelete(null);
-          } catch(error) { console.error(error); }
-          setIsSubmitting(false);
-      };
-
+    const handleDeleteCourse = async () => {
+      if (!courseToDelete) return;
+      setIsSubmitting(true);
+      try {
+        // PERBAIKAN: Memastikan yang dibandingkan adalah ID dengan ID secara akurat
+        const targetId = courseToDelete.id || courseToDelete;
+        const updatedCourses = courses.filter(c => c.id !== targetId);
+        
+        await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
+        setCourseToDelete(null);
+      } catch(error) { 
+        console.error("Gagal menghapus:", error); 
+      }
+      setIsSubmitting(false);
+    };
+      
       const handleDropCourse = async (targetIdx) => {
           if(draggedItemIdx === null || draggedItemIdx === targetIdx) return;
           setIsSubmitting(true);
