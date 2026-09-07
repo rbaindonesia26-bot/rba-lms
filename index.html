@@ -155,7 +155,7 @@
       ShoppingCart, ShieldCheck, Link2, Ticket, Percent, Banknote, Scale,
       Bot, Wand2, AudioLines, Radar, SpellCheck, ThumbsUp, Send, Loader2, Building, Handshake,
       Youtube, Instagram, Radio, Newspaper, MousePointerClick, Star, ChevronRight, X, Library, LogOut, Menu,
-      Key, Trash2, UserCog, Save, ExternalLink, Printer, Receipt
+      Key, Trash2, UserCog, Save, ExternalLink, Printer, Receipt, Download
     } from 'https://esm.sh/lucide-react@0.344.0';
 
     const firebaseConfig = {
@@ -2908,6 +2908,34 @@ if (view === 'modules') {
                       <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
                   </div>
                   <Button onClick={handleAdd} className="gap-2 border-none shrink-0"><PlusCircle size={18}/> Tambah</Button>
+
+{/* TOMBOL BACKUP DATABASE */}
+<button
+  type="button"
+  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm text-sm font-bold shrink-0"
+  onClick={async () => {
+    try {
+      const docRef = doc(db, "rba_lms", "main_db");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const fileData = JSON.stringify(docSnap.data(), null, 2);
+        const blob = new Blob([fileData], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Backup_RBA_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert("✅ Alhamdulillah! Data berhasil di-backup ke laptop.");
+      }
+    } catch (error) {
+      alert("❌ Gagal memuat backup: Pastikan getDoc sudah di-import di atas.");
+    }
+  }}
+>
+  <Download size={18} /> Backup JSON
+</button>
                </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
