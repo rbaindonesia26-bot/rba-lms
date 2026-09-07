@@ -155,7 +155,7 @@
       ShoppingCart, ShieldCheck, Link2, Ticket, Percent, Banknote, Scale,
       Bot, Wand2, AudioLines, Radar, SpellCheck, ThumbsUp, Send, Loader2, Building, Handshake,
       Youtube, Instagram, Radio, Newspaper, MousePointerClick, Star, ChevronRight, X, Library, LogOut, Menu,
-      Key, Trash2, UserCog, Save, ExternalLink, Printer, Receipt
+      Key, Trash2, UserCog, Save, ExternalLink, Printer, Receipt, Upload
     } from 'https://esm.sh/lucide-react@0.344.0';
 
     const firebaseConfig = {
@@ -2936,6 +2936,43 @@ if (view === 'modules') {
 >
   <Download size={18} /> Backup JSON
 </button>
+                 {/* TOMBOL RESTORE (PULIHKAN DATA) */}
+<label className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-sm text-sm font-bold shrink-0 cursor-pointer">
+  <Upload size={18} /> Pulihkan JSON
+  <input 
+    type="file" 
+    accept=".json" 
+    className="hidden" 
+    onChange={async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // Keamanan ganda agar tidak tak sengaja terpencet
+      if(!window.confirm("PERINGATAN BUKAN MAIN-MAIN:\nMemulihkan data akan MENIMPA SELURUH DATA kelas, santri, dan perpustakaan saat ini dengan isi dari file backup.\n\nApakah Ustadz yakin ingin melanjutkan?")) {
+        e.target.value = ''; 
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const parsedData = JSON.parse(event.target.result);
+          const docRef = doc(db, "rba_lms", "main_db");
+          
+          // Menimpa data di Firebase dengan data dari file JSON
+          await setDoc(docRef, parsedData);
+          
+          alert("✅ Alhamdulillah! Data berhasil dipulihkan. Halaman akan dimuat ulang.");
+          window.location.reload();
+        } catch (error) {
+          console.error(error);
+          alert("❌ Gagal memulihkan data. Pastikan file yang dipilih adalah file JSON backup yang benar.");
+        }
+      };
+      reader.readAsText(file);
+    }} 
+  />
+</label>
                </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
