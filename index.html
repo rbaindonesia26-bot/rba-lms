@@ -4720,25 +4720,24 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
         });
     }
 
-    const handleAction = async (uid, courseId, newStatus) => {
-        try {
-            if (!db) {
-                alert('Database belum siap.');
-                return;
-            }
-            const enrollRef = doc(db, 'enrollments', uid);
-            await setDoc(enrollRef, {
-                classes: {
-                    [courseId]: newStatus
-                }
-            }, { merge: true });
-            
-            alert(`Permintaan berhasil diubah menjadi: ${newStatus === 'approved' ? 'Disetujui ✅' : 'Ditolak ❌'}`);
-        } catch (e) {
-            alert('Gagal memproses aksi: ' + e.message);
+const handleAction = async (uid, courseId, newStatus) => {
+      try {
+        if (!db) {
+          alert('Database belum siap.');
+          return;
         }
+        
+        // JALUR DATABASE YANG BENAR (MENGARAH KE MAIN_DB)
+        await updateDoc(doc(db, "rba_lms", "main_db"), {
+          [`enrollments.${uid}.classes.${courseId}`]: newStatus
+        });
+        
+        alert(`Permintaan berhasil diubah menjadi: ${newStatus === 'approved' ? 'Disetujui ✅' : 'Ditolak ❌'}`);
+      } catch (e) {
+        alert('Gagal memproses aksi: ' + e.message);
+      }
     };
-
+  
     return (
         <div className="p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6 pb-24">
             <h1 className="text-3xl font-black mb-6">Persetujuan Kelas</h1>
