@@ -4817,8 +4817,8 @@ if (isAppInitializing) return (
         <ThemeContext.Provider value="admin">
            <InstallPrompt />
            <LandingPage onLogin={handleLoginSuccess} usersData={usersData} isDbReady={firebaseStatus !== 'connecting'} coursesData={courses} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} lang={lang} setLang={setLang} pengumuman={pengumuman} libraryData={libraryData} />
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 15px) + 12px)' }}>
-            <div className="flex justify-around items-center w-full">
+          <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl flex justify-around items-center p-2 shadow-xl">
+          <div className="flex justify-around items-center w-full">
             
             {/* BERANDA (Kembali ke paling atas) */}
             <button onClick={() => { 
