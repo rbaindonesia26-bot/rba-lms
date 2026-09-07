@@ -1463,9 +1463,9 @@
                         {!isPending && (
                            <div className="flex gap-2 w-full md:w-auto">
                                {isFinished && <Button size="sm" onClick={() => onShowSertifikat(course)} className="flex-1 md:flex-none bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-amber-500/30 border-none gap-2 text-xs sm:text-sm"><Award size={16}/> Unduh Sertifikat</Button>}
-                               <Button size="sm" variant={isFinished ? 'outline' : 'primary'} className={`flex-1 md:flex-none shrink-0 gap-2 text-xs sm:text-sm h-10 sm:h-auto ${isFinished ? '' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-none'}`} onClick={() => onGoToClass(course)}>
-                                  {isFinished ? 'Ulangi' : 'Lanjut'} <span className="hidden sm:inline">Belajar</span> <ChevronRight size={16}/>
-                               </Button>
+                                <Button size="sm" variant={isFinished ? 'outline' : 'primary'} onClick={() => onGoToClass(course)} className="flex-1 md:flex-none bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-amber-500/30 border-none shrink-0 gap-2 text-xs sm:text-sm h-10 sm:h-auto">
+                                {isFinished ? 'Ulangi' : 'Lanjut'} <span className="hidden sm:inline">Belajar</span> <ChevronRight size={16}/>
+                            </Button>
                            </div>
                         )}
                      </Card>
