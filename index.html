@@ -3887,8 +3887,52 @@ const compressImage = (file) => {
                    </div>
                    <form onSubmit={handleSave} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                       <div><label className="block text-sm font-bold mb-2">Judul Buku / Materi</label><input type="text" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm" /></div>
-                      <div><label className="block text-sm font-bold mb-2">Deskripsi Singkat</label><textarea required rows="3" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm resize-none"></textarea></div>
-                      
+<div>
+  <label className="block text-sm font-bold mb-2">Deskripsi Singkat</label>
+  
+  {/* Deretan Tombol Format Cepat untuk Perpustakaan */}
+  <div className="flex flex-wrap gap-2 mb-2 select-none">
+    {[
+      { label: 'B', start: '<b>', end: '</b>', style: 'font-bold px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200' },
+      { label: 'I', start: '<i>', end: '</i>', style: 'italic px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200' },
+      { label: 'U', start: '<u>', end: '</u>', style: 'underline px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200' },
+      { label: 'Hijau', start: '<span style="color:#16a34a">', end: '</span>', style: 'font-semibold px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200' },
+      { label: 'Merah', start: '<span style="color:#dc2626">', end: '</span>', style: 'font-semibold px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200' },
+      { label: 'Oranye', start: '<span style="color:#ea580c">', end: '</span>', style: 'font-semibold px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200' }
+    ].map((btn) => (
+      <button
+        key={btn.label}
+        type="button"
+        className={btn.style}
+        onClick={() => {
+          const textarea = document.getElementById('input-desc-lib');
+          if (!textarea) return;
+          const s = textarea.selectionStart;
+          const e = textarea.selectionEnd;
+          const val = formData.desc || '';
+          const newVal = val.substring(0, s) + btn.start + val.substring(s, e) + btn.end + val.substring(e);
+          setFormData({ ...formData, desc: newVal });
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(s + btn.start.length, e + btn.start.length);
+          }, 0);
+        }}
+      >
+        {btn.label}
+      </button>
+    ))}
+  </div>
+
+  <textarea
+    id="input-desc-lib"
+    dir="auto"
+    required
+    rows="4"
+    value={formData.desc}
+    onChange={e => setFormData({...formData, desc: e.target.value})}
+    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm dark:border-slate-700 dark:text-white"
+  />
+</div>                      
                       <div>
                           <label className="block text-sm font-bold mb-2">Jenis File / Format</label>
                           <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-600 text-sm">
