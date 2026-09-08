@@ -2291,19 +2291,17 @@
       const handleEdit = (course) => { setFormData(course); setUploadMsg(''); setView('form'); };
       const openModules = (course) => { setActiveCourse(course); setView('modules'); };
 
-    const handleDeleteCourse = async () => {
+const handleDeleteCourse = async () => {
       if (!courseToDelete) return;
       setIsSubmitting(true);
       try {
-        // PERBAIKAN: Memastikan yang dibandingkan adalah ID dengan ID secara akurat
+        const freshSnap = await getDoc(doc(db, "rba_lms", "main_db"));
+        let serverCourses = freshSnap.exists() && freshSnap.data().courses ? freshSnap.data().courses : [];
         const targetId = courseToDelete.id || courseToDelete;
-        const updatedCourses = courses.filter(c => c.id !== targetId);
-        
+        const updatedCourses = serverCourses.filter(c => c.id !== targetId);
         await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
         setCourseToDelete(null);
-      } catch(error) { 
-        console.error("Gagal menghapus:", error); 
-      }
+      } catch(error) { console.error("Gagal menghapus:", error); }
       setIsSubmitting(false);
     };
       
@@ -2441,14 +2439,15 @@
           executeAI(savedKey);
       };
 
-      const handleSave = async (e) => {
+const handleSave = async (e) => {
          e.preventDefault(); setIsSubmitting(true);
          try {
-             let updatedCourses = [...courses];
-             const existingIdx = updatedCourses.findIndex(c => c.id === formData.id);
-             if (existingIdx >= 0) { updatedCourses[existingIdx] = formData; } else { updatedCourses.push(formData); }
-             await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
-             alert("✅ Alhamdulillah, Program berhasil disimpan!"); // <--- SUNTIKAN DI SINI
+             const freshSnap = await getDoc(doc(db, "rba_lms", "main_db"));
+             let serverCourses = freshSnap.exists() && freshSnap.data().courses ? freshSnap.data().courses : [];
+             const existingIdx = serverCourses.findIndex(c => c.id === formData.id);
+             if (existingIdx >= 0) { serverCourses[existingIdx] = formData; } else { serverCourses.push(formData); }
+             await setDoc(doc(db, "rba_lms", "main_db"), { courses: serverCourses }, { merge: true });
+             alert("✅ Alhamdulillah, Program berhasil disimpan!");
              setView('list');
         } catch(error) { alert("GAGAL MENYIMPAN PROGRAM: " + error.message); }
         setIsSubmitting(false);
@@ -2457,16 +2456,17 @@
       const handleSaveModul = async (e) => {
          e.preventDefault(); setIsSubmitting(true);
          try {
-             let updatedCourses = [...courses];
-             const courseIdx = updatedCourses.findIndex(c => c.id === activeCourse.id);
+             const freshSnap = await getDoc(doc(db, "rba_lms", "main_db"));
+             let serverCourses = freshSnap.exists() && freshSnap.data().courses ? freshSnap.data().courses : [];
+             const courseIdx = serverCourses.findIndex(c => c.id === activeCourse.id);
              if (courseIdx >= 0) {
                  const newModul = { ...modulForm, id: modulForm.id || 'mdl_' + Date.now().toString(36) };
-                 const existingModules = updatedCourses[courseIdx].modules || [];
+                 const existingModules = serverCourses[courseIdx].modules || [];
                  if (modulForm.id) { const mIdx = existingModules.findIndex(m => m.id === modulForm.id); if (mIdx >= 0) existingModules[mIdx] = newModul; } else { existingModules.push(newModul); }
-                 updatedCourses[courseIdx].modules = existingModules;
-                 await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
-                 alert("✅ Alhamdulillah, Materi/Modul berhasil ditambahkan!"); // <--- SUNTIKAN DI SINI
-                 setActiveCourse(updatedCourses[courseIdx]);
+                 serverCourses[courseIdx].modules = existingModules;
+                 await setDoc(doc(db, "rba_lms", "main_db"), { courses: serverCourses }, { merge: true });
+                 alert("✅ Alhamdulillah, Materi/Modul berhasil ditambahkan!");
+                 setActiveCourse(serverCourses[courseIdx]);
                  setIsModulFormOpen(false); setModulForm({ id: '', title: '', desc: '', type: 'youtube', url: '', questions: [] }); setUploadMsg('');
              }
         } catch(error) { alert("GAGAL MENYIMPAN MATERI: " + error.message); }
@@ -2477,18 +2477,19 @@
          if (!modulToDelete) return;
          setIsSubmitting(true);
          try {
-             let updatedCourses = [...courses];
-             const courseIdx = updatedCourses.findIndex(c => c.id === activeCourse.id);
+             const freshSnap = await getDoc(doc(db, "rba_lms", "main_db"));
+             let serverCourses = freshSnap.exists() && freshSnap.data().courses ? freshSnap.data().courses : [];
+             const courseIdx = serverCourses.findIndex(c => c.id === activeCourse.id);
              if (courseIdx >= 0) {
-                 updatedCourses[courseIdx].modules = (updatedCourses[courseIdx].modules || []).filter(m => m.id !== modulToDelete);
-                 await setDoc(doc(db, "rba_lms", "main_db"), { courses: updatedCourses }, { merge: true });
-                 setActiveCourse(updatedCourses[courseIdx]);
+                 serverCourses[courseIdx].modules = (serverCourses[courseIdx].modules || []).filter(m => m.id !== modulToDelete);
+                 await setDoc(doc(db, "rba_lms", "main_db"), { courses: serverCourses }, { merge: true });
+                 setActiveCourse(serverCourses[courseIdx]);
                  setModulToDelete(null);
              }
         } catch(error) { alert("GAGAL MENGHAPUS MATERI: " + error.message); }
         setIsSubmitting(false);
       };
-
+      
       if (view === 'form') {
          return (
             <div className="p-4 md:p-6 w-full max-w-3xl mx-auto space-y-6 animate-slide-up pb-24">
