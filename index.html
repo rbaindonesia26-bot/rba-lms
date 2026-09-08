@@ -1074,7 +1074,7 @@
                 
                 const textWa = `*KARTU AKSES RUMAH BAHASA ARAB* 🎓\n\nAssalamu'alaikum, Kak ${regData.nama}.\n\nAlhamdulillah, pendaftaran Anda untuk program *${regData.program}* telah kami verifikasi. Akses kelas Anda resmi diterbitkan!\n\n🔑 *Token (PIN):* *${newToken}*\n\n*Cara Masuk:*\n1. Buka tautan Rumah Bahasa Arab.\n2. Klik tombol "Masuk".\n3. Ketikkan Nama dan Token (PIN) di atas secara persis huruf besarnya.\n\nSelamat belajar di Rumah Bahasa Arab!`;
                 
-                window.open(`https://api.whatsapp.com/send?phone=${waNumber}&text=${encodeURIComponent(textWa)}`, '_blank');
+               window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(textWa)}`, '_blank'); 
 
             } catch (error) { 
                 console.error("Gagal approve", error); 
@@ -1887,7 +1887,7 @@
       const handleSendWa = (user) => {
          const text = `*KARTU AKSES RUMAH BAHASA ARAB* 🎓\n\nAssalamu'alaikum, ${user.name || 'Calon Peserta'}.\n\nAkses masuk kelas pembelajaran Anda telah resmi diterbitkan. Harap simpan informasi rahasia ini:\n\n👤 *Nama:* ${user.name || '-'}\n🔑 *Token (PIN):* *${user.token}*\n🔰 *Status:* ${user.role.toUpperCase()}\n\n*Cara Masuk:*\n1. Buka tautan website Rumah Bahasa Arab.\n2. Klik tombol "Masuk" di pojok kanan.\n3. Ketikkan Nama dan Token (PIN) di atas secara presisi (huruf besar/kecil berpengaruh).\n\n_Mohon untuk tidak membagikan Token ini kepada pihak lain demi keamanan akun Anda._\n\nSelamat belajar!`;
          
-         const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`; 
          window.open(whatsappUrl, '_blank');
       };
 
@@ -3118,7 +3118,7 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
 
       const handleSendWaPersetujuan = (req) => {
           const text = `Assalamu'alaikum ${req.userName},\n\nAlhamdulillah, permintaan akses Anda untuk kelas *${req.courseTitle}* telah kami *SETUJUI* ✅.\n\nSilakan login ke portal Rumah Bahasa Arab menggunakan Token Anda (${req.userToken}) untuk mulai belajar.\n\nSelamat belajar!`;
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+          window.open(`whatsapp://send?text=${encodeURIComponent(text)}`, '_blank');  
       };
 
       return (
