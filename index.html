@@ -4354,7 +4354,7 @@ const compressImage = (file) => {
             if(data.library) setLibraryData(data.library); else setLibraryData([]);
         } else {
             // Inisiasi database awal jika sama sekali belum pernah dibuat (Tanpa Demo Kursus)
-            try { setDoc(doc(db, "rba_lms", "main_db"), { courses: [], users: defaultUsers }, { merge: true }); } catch(e) {}
+            console.warn("Menunggu data stabil...");                
         }
             setFirebaseStatus('online'); clearTimeout(timeoutId); setIsAppInitializing(false);
           }, (error) => { setFirebaseStatus('error'); clearTimeout(timeoutId); setIsAppInitializing(false); });
