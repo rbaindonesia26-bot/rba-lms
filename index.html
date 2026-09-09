@@ -4931,8 +4931,8 @@ if (isAppInitializing) return (
         <ThemeContext.Provider value="admin">
            <InstallPrompt />
            <LandingPage onLogin={handleLoginSuccess} usersData={usersData} isDbReady={firebaseStatus !== 'connecting'} coursesData={courses} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} lang={lang} setLang={setLang} pengumuman={pengumuman} libraryData={libraryData} />
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 flex justify-around items-center pt-2 pb-4 px-2 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
-          <div className="flex justify-around items-center w-full">
+          <div className="md:hidden fixed bottom-12 left-4 right-4 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 rounded-2xl flex justify-around items-center p-2 shadow-2xl">
+           <div className="flex justify-around items-center w-full">
             
             {/* BERANDA (Kembali ke paling atas) */}
             <button onClick={() => { 
@@ -5116,7 +5116,7 @@ if (isAppInitializing) return (
       {/* ========================================= */}
       {/* BILAH NAVIGASI BAWAH RESPONSIF (RBA)      */}
       {/* ========================================= */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center pt-2 pb-4 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
   
         {/* 1. JIKA BELUM LOGIN / TAMU (MUNCUL JIKA BELUM LOGIN / ROLE KOSONG) */}
         {(!isLoggedIn || !role || role === '') && (
