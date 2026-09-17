@@ -2245,7 +2245,7 @@
 
     const ManajemenProgramAdmin = ({ courses, db, storage, role, currentUserUid }) => {
       const [view, setView] = useState('list');
-      const [formData, setFormData] = useState({ id: '', title: '', desc: '', kategori: "Bahasa Arab", status: 'Draft', coverUrl: '' });
+      const [formData, setFormData] = useState({ id: '', title: '', desc: '', kategori: "Bahasa Arab", status: 'Draft', coverUrl: '', creator_id: currentUserUid });
       const [kategoriFilter, setKategoriFilter] = useState('Semua');
       const [isSubmitting, setIsSubmitting] = useState(false);
       const [isUploading, setIsUploading] = useState(false);
@@ -2344,7 +2344,7 @@
          }
       };
 
-      const handleAdd = () => { setFormData({ id: 'crs_' + Date.now().toString(36), title: '', desc: '', kategori: "Bahasa Arab", status: 'Draft', coverUrl: '', modules: [] }); setUploadMsg(''); setView('form'); };
+      const handleAdd = () => { setFormData({ id: 'crs_' + Date.now().toString(36), title: '', desc: '', kategori: "Bahasa Arab", status: 'Draft', coverUrl: '', modules: [], creator_id: currentUserUid }); }
       const handleEdit = (course) => { setFormData(course); setUploadMsg(''); setView('form'); };
       const openModules = (course) => { setActiveCourse(course); setView('modules'); };
 
