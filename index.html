@@ -3208,7 +3208,7 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
       );
     };
 
-    const DetailProgram = ({ program, onBack, onEnroll, enrollmentStatus, role, onGoToClass, onManage }) => {
+    const DetailProgram = ({ program, onBack, onEnroll, enrollmentStatus, role, onGoToClass, onManage, currentUserUid }) => {
       if (!program) return null;
       return (
          <div className="p-4 md:p-6 lg:p-8 w-full max-w-5xl mx-auto space-y-6 pb-24">
@@ -3231,7 +3231,7 @@ const PersetujuanAdmin = ({ enrollments, courses, usersData, db }) => {
 </div>
                   <div className="mt-auto pt-6 border-t border-slate-100 w-full">
                 {/* Gembok Tombol Interaksi & Kelola di Detail Program */}
-                  {(role === 'admin' || (program.creator_id && program.creator_id === uid)) ? (
+                  {(role === 'admin' || (program.creator_id && program.creator_id === currentUserUid)) ? (
                       <div className="flex flex-col sm:flex-row gap-3 w-full">
                         <Button onClick={onGoToClass}>
                             <MessageCircle size={18} className="mr-2"/> Masuk Kelas & Balas Diskusi
