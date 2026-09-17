@@ -3051,7 +3051,7 @@ if (view === 'modules') {
                            <span className="text-xs font-bold text-slate-500">{(prog.modules || []).length} Materi</span>
 <div className="flex gap-1 items-center">
     {/* Tombol Kelola Materi / Tumpukan Kertas dikunci jika program pusat dan yang login guru */}
-    {(role === 'admin' || role === 'guru') ? (
+    {(role === 'admin' || prog.creator_id === currentUserUid) ? (
         <button onClick={() => openModules(prog)} className="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg" title="Kelola Materi">
             <Layers size={16} />
         </button>
